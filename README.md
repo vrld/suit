@@ -1,6 +1,6 @@
 # QUICKIE
 
-Quickie is an [immediate mode gui][IMGUI] library for LÖVE.
+Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]
 
 ## Example
 
@@ -45,3 +45,7 @@ Quickie is an [immediate mode gui][IMGUI] library for LÖVE.
 ## Documentation
 
 TODO
+
+
+[LOVE]: http://love2d.org
+[IMGUI]: http://www.mollyrocket.com/forums/viewforum.php?f=10
