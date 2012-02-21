@@ -18,7 +18,7 @@ local function hasKeyFocus(id) return context.keyfocus == id end
 
 -- input
 local mouse = {x = 0, y = 0, down = false}
-local keyboard = {key = nil, code = -1}
+local keyboard = {key = nil, code = -1, ctrl = {down = {key = "tab", code = 9}, up = {key = "tab", code = 0}}}
 
 function mouse.inRect(x,y,w,h)
 	return mouse.x >= x and mouse.x <= x+w and mouse.y >= y and mouse.y <= y+h
@@ -42,6 +42,12 @@ function keyboard.pressed(key, code)
 	keyboard.code = code
 end
 
+function keyboard.controls(ctrl)
+	keyboard.ctrl.up = ctrl.up
+	keyboard.ctrl.down = ctrl.down
+end
+
+
 function keyboard.tryGrab(id)
 	if not context.keyfocus then
 		context.keyfocus = id
@@ -50,13 +56,17 @@ end
 
 local function makeTabable(id)
 	keyboard.tryGrab(id)
-	if hasKeyFocus(id) and keyboard.key == 'tab' then
-		if love.keyboard.isDown('rshift', 'lshift') then
+	if hasKeyFocus(id) then
+		if keyboard.key ~= nil then
+			print(string.format("Keyboard values: %s, %d | Set control values: (down) %s, %d (up) %s, %d", keyboard.key, keyboard.code, keyboard.ctrl.down.key, keyboard.ctrl.down.code, keyboard.ctrl.up.key, keyboard.ctrl.up.code))
+		end
+		if keyboard.key == keyboard.ctrl.up.key and keyboard.code == keyboard.ctrl.up.code then
 			setKeyFocus(context.lastwidget)
-		else
+		elseif keyboard.key == keyboard.ctrl.down.key and keyboard.code == keyboard.ctrl.down.code then
 			setKeyFocus(nil)
 		end
 		keyboard.key = nil
+		keyboard.code = -1
 	end
 	context.lastwidget = id
 end
