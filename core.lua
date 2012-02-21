@@ -43,9 +43,11 @@ function keyboard.pressed(key, code)
 	keyboard.code = code
 end
 
-function keyboard.controls(up, down)
-	keyboard.ctrl.up = up
-	keyboard.ctrl.down = down
+function keyboard.controls(up, down, upCode, downCode)
+	keyboard.ctrl.up.key = up
+	keyboard.ctrl.down.key = down
+	keyboard.ctrl.up.code = upCode or -1
+	keyboard.ctrl.down.code = downCode or -1
 end
 
 
@@ -58,16 +60,28 @@ end
 local function makeTabable(id)
 	keyboard.tryGrab(id)
 	if hasKeyFocus(id) then
-		if keyboard.key ~= nil then
-			print(string.format("Keyboard values: %s, %d | Set control values: (down) %s, %d (up) %s, %d", keyboard.key, keyboard.code, keyboard.ctrl.down.key, keyboard.ctrl.down.code, keyboard.ctrl.up.key, keyboard.ctrl.up.code))
+		if keyboard.ctrl.up.code ~= -1 then
+			if keyboard.key == keyboard.ctrl.up.key and keyboard.code == keyboard.ctrl.up.code then
+				setKeyFocus(context.lastwidget)
+				keyboard.key = nil
+			end
+		else
+			if keyboard.key == keyboard.ctrl.up.key then
+				setKeyFocus(context.lastwidget)
+				keyboard.key = nil
+			end
 		end
-		if keyboard.key == keyboard.ctrl.up.key and keyboard.code == keyboard.ctrl.up.code then
-			setKeyFocus(context.lastwidget)
-		elseif keyboard.key == keyboard.ctrl.down.key and keyboard.code == keyboard.ctrl.down.code then
-			setKeyFocus(nil)
+		if keyboard.ctrl.down.code ~= -1 then
+			if keyboard.key == keyboard.ctrl.down.key and keyboard.code == keyboard.ctrl.down.code then
+				setKeyFocus(nil)
+				keyboard.key = nil
+			end
+		else
+			if keyboard.key == keyboard.ctrl.down.key then
+				setKeyFocus(nil)
+				keyboard.key = nil
+			end
 		end
-		keyboard.key = nil
-		keyboard.code = -1
 	end
 	context.lastwidget = id
 end
