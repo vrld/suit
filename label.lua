@@ -1,4 +1,4 @@
-local core = require((...):match("^(.+)%.[^%.]+") .. '.core')
+local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
 return function(text, x,y,w,h,align, draw)
 	local id = core.generateID()

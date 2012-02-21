@@ -1,5 +1,6 @@
 -- state
 local context = {maxid = 0}
+local draw_items = {n = 0}
 local NO_WIDGET = function()end
 
 local function generateID()
@@ -87,7 +88,6 @@ local function save_unpack(t, i)
 	return t[i], save_unpack(t, i+1)
 end
 
-local draw_items = {n = 0}
 local function registerDraw(id, f, ...)
 	assert(type(f) == 'function' or (getmetatable(f) or {}).__call,
 	       'Drawing function is not a callable type!')
@@ -141,7 +141,7 @@ return {
 	hasKeyFocus  = hasKeyFocus,
 	makeTabable  = makeTabable,
 
-	style        = require((...):match("^(.+)%.[^%.]+") .. '.style-default'),
+	style        = require((...):match("(.-)[^%.]+$") .. '.style-default'),
 	color        = color,
 	registerDraw = registerDraw,
 	draw         = draw,

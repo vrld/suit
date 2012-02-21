@@ -1,4 +1,4 @@
-local BASE = (...) .. '.'
+local BASE = ((...):match('(.+)%.') or ...) .. '.'
 
 return {
 	core     = require(BASE .. 'core'),
