@@ -43,9 +43,9 @@ function keyboard.pressed(key, code)
 	keyboard.code = code
 end
 
-function keyboard.controls(ctrl)
-	keyboard.ctrl.up = ctrl.up
-	keyboard.ctrl.down = ctrl.down
+function keyboard.controls(up, down)
+	keyboard.ctrl.up = up
+	keyboard.ctrl.down = down
 end
 
 
