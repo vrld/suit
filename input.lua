@@ -1,4 +1,4 @@
-local core = require((...):match("^(.+)%.[^%.]+") .. '.core')
+local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
 return function(info, x,y,w,h, draw)
 	info.text = info.text or ""
@@ -10,6 +10,7 @@ return function(info, x,y,w,h, draw)
 	if core.isActive(id) then core.setKeyFocus(id) end
 
 	core.registerDraw(id, draw or core.style.Input, info.text, info.cursor, x,y,w,h)
+	if not core.hasKeyFocus(id) then return false end
 
 	local changed = false
 	-- editing

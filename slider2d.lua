@@ -1,4 +1,4 @@
-local core = require((...):match("^(.+)%.[^%.]+") .. '.core')
+local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
 return function(info, x,y,w,h, draw)
 	assert(type(info) == 'table' and type(info.value) == "table", "Incomplete slider value info")

@@ -1,4 +1,4 @@
-local core = require((...):match("^(.+)%.[^%.]+") .. '.core')
+local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
 -- the widget
 return function(title, x,y, w,h, draw)
