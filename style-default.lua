@@ -12,10 +12,6 @@ end
 
 local function Button(state, title, x,y,w,h)
 	local c = color[state]
-	if state ~= 'normal' then
-		love.graphics.setColor(c.fg)
-		love.graphics.rectangle('fill', x+3,y+3,w,h)
-	end
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
 	love.graphics.setColor(c.fg)
@@ -39,10 +35,6 @@ end
 
 local function Slider(state, fraction, x,y,w,h, vertical)
 	local c = color[state]
-	if state ~= 'normal' then
-		love.graphics.setColor(c.fg)
-		love.graphics.rectangle('fill', x+3,y+3,w,h)
-	end
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
 
@@ -59,10 +51,6 @@ end
 
 local function Slider2D(state, fraction, x,y,w,h, vertical)
 	local c = color[state]
-	if state ~= 'normal' then
-		love.graphics.setColor(c.fg)
-		love.graphics.rectangle('fill', x+3,y+3,w,h)
-	end
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
 
@@ -83,10 +71,6 @@ end
 
 local function Input(state, text, cursor, x,y,w,h)
 	local c = color[state]
-	if state ~= 'normal' then
-		love.graphics.setColor(c.fg)
-		love.graphics.rectangle('fill', x+3,y+3,w,h)
-	end
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
 	love.graphics.setColor(c.fg)
@@ -107,17 +91,13 @@ end
 
 local function Checkbox(state, checked, x,y,w,h)
 	local c = color[state]
-	if state ~= 'normal' then
-		love.graphics.setColor(c.fg)
-		love.graphics.rectangle('fill', x+3,y+3,w,h)
-	end
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
 	love.graphics.setColor(c.fg)
 	love.graphics.rectangle('line', x,y,w,h)
 	if checked then
-		local r = math.max(math.min(w/2,h/2) - 3, 2)
-		love.graphics.circle('fill', x+w/2,y+h/2,r)
+		local r = math.max(math.min(w/7,h/7), 2)
+		love.graphics.rectangle('fill', x+r,y+r, w-2*r,h-2*r)
 	end
 end
 
