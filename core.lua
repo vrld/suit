@@ -59,7 +59,7 @@ function keyboard.isBindingDown(bind)
 	return keyboard.key == bind.key and modifiersDown
 end
 
-local function makeTabable(id)
+local function makeCyclable(id)
 	keyboard.tryGrab(id)
 	if hasKeyFocus(id) then
 		if keyboard.isBindingDown(keyboard.cycle.prev) then
@@ -146,7 +146,7 @@ return {
 	isHot        = isHot,
 	isActive     = isActive,
 	hasKeyFocus  = hasKeyFocus,
-	makeTabable  = makeTabable,
+	makeCyclable = makeCyclable,
 
 	style        = require((...):match("(.-)[^%.]+$") .. '.style-default'),
 	color        = color,

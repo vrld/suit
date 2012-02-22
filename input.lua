@@ -6,7 +6,7 @@ return function(info, x,y,w,h, draw)
 
 	local id = core.generateID()
 	core.mouse.updateState(id, x,y,w,h)
-	core.makeTabable(id)
+	core.makeCyclable(id)
 	if core.isActive(id) then core.setKeyFocus(id) end
 
 	core.registerDraw(id, draw or core.style.Input, info.text, info.cursor, x,y,w,h)

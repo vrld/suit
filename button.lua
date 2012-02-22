@@ -13,9 +13,10 @@ return function(title, x,y, w,h, draw)
 	-- core.mouse.updateState(id, x,y,w,h) updates the state for this widget.
 	core.mouse.updateState(id, x,y,w,h)
 
-	-- core.makeTabable makes the item focus on tab. Tab order is determied
-	-- by the order you call the widget functions.
-	core.makeTabable(id)
+	-- core.makeCyclable makes the item focus on tab or whatever binding is
+	-- in place (see core.keyboard.cycle). Cycle order is determied by the
+	-- order you call the widget functions.
+	core.makeCyclable(id)
 
 	-- core.registerDraw(id, drawfunction, drawfunction-arguments...)
 	-- shows widget when core.draw() is called.

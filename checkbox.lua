@@ -4,7 +4,7 @@ return function(info, x,y, w,h, draw)
 	local id = core.generateID()
 
 	core.mouse.updateState(id, x,y,w,h)
-	core.makeTabable(id)
+	core.makeCyclable(id)
 	core.registerDraw(id, draw or core.style.Checkbox, info.checked,x,y,w,h)
 
 	local checked = info.checked
