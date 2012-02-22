@@ -19,7 +19,12 @@ local function hasKeyFocus(id) return context.keyfocus == id end
 
 -- input
 local mouse = {x = 0, y = 0, down = false}
-local keyboard = {key = nil, code = -1, ctrl = {down = {key = "tab", code = 9}, up = {key = "tab", code = 0}}}
+local keyboard = {key = nil, code = -1}
+keyboard.cycle = {
+	-- binding = {key = key, modifier1, modifier2, ...} XXX: modifiers are OR-ed!
+	prev = {key = 'tab', 'lshift', 'rshift'},
+	next = {key = 'tab'},
+}
 
 function mouse.inRect(x,y,w,h)
 	return mouse.x >= x and mouse.x <= x+w and mouse.y >= y and mouse.y <= y+h
@@ -43,44 +48,26 @@ function keyboard.pressed(key, code)
 	keyboard.code = code
 end
 
-function keyboard.controls(up, down, upCode, downCode)
-	keyboard.ctrl.up.key = up
-	keyboard.ctrl.down.key = down
-	keyboard.ctrl.up.code = upCode or -1
-	keyboard.ctrl.down.code = downCode or -1
-end
-
-
 function keyboard.tryGrab(id)
 	if not context.keyfocus then
 		context.keyfocus = id
 	end
 end
 
+function keyboard.isBindingDown(bind)
+	local modifiersDown = #bind == 0 or love.keyboard.isDown(unpack(bind))
+	return keyboard.key == bind.key and modifiersDown
+end
+
 local function makeTabable(id)
 	keyboard.tryGrab(id)
 	if hasKeyFocus(id) then
-		if keyboard.ctrl.up.code ~= -1 then
-			if keyboard.key == keyboard.ctrl.up.key and keyboard.code == keyboard.ctrl.up.code then
-				setKeyFocus(context.lastwidget)
-				keyboard.key = nil
-			end
-		else
-			if keyboard.key == keyboard.ctrl.up.key then
-				setKeyFocus(context.lastwidget)
-				keyboard.key = nil
-			end
-		end
-		if keyboard.ctrl.down.code ~= -1 then
-			if keyboard.key == keyboard.ctrl.down.key and keyboard.code == keyboard.ctrl.down.code then
-				setKeyFocus(nil)
-				keyboard.key = nil
-			end
-		else
-			if keyboard.key == keyboard.ctrl.down.key then
-				setKeyFocus(nil)
-				keyboard.key = nil
-			end
+		if keyboard.isBindingDown(keyboard.cycle.prev) then
+			setKeyFocus(context.lastwidget)
+			keyboard.key = nil
+		elseif keyboard.isBindingDown(keyboard.cycle.next) then
+			setKeyFocus(nil)
+			keyboard.key = nil
 		end
 	end
 	context.lastwidget = id
@@ -145,10 +132,6 @@ local function draw()
 	mouse.x, mouse.y = love.mouse.getPosition()
 	mouse.down = love.mouse.isDown('l')
 
-	-- clear keyboard focus if nobody wants it
-	if keyboard.key == 'tab' then
-		context.keyboardfocus = nil
-	end
 	keyboard.key, keyboard.code = nil, -1
 end
 
