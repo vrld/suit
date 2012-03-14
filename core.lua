@@ -151,6 +151,7 @@ return {
 	hasKeyFocus     = hasKeyFocus,
 
 	disableKeyFocus = disableKeyFocus,
+	enableKeyFocus  = clearKeyFocus,
 	clearKeyFocus   = clearKeyFocus,
 	makeCyclable    = makeCyclable,
 
