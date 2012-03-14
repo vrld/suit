@@ -17,6 +17,9 @@ local function isActive(id)  return context.active == id end
 local function setKeyFocus(id) context.keyfocus = id end
 local function hasKeyFocus(id) return context.keyfocus == id end
 
+local function disableKeyFocus() return setKeyFocus{} end
+local function clearKeyFocus() return setKeyFocus(nil) end
+
 -- input
 local mouse = {x = 0, y = 0, down = false}
 local keyboard = {key = nil, code = -1}
@@ -50,7 +53,7 @@ end
 
 function keyboard.tryGrab(id)
 	if not context.keyfocus then
-		context.keyfocus = id
+		setKeyFocus(id)
 	end
 end
 
@@ -136,25 +139,28 @@ local function draw()
 end
 
 return {
-	mouse        = mouse,
-	keyboard     = keyboard,
+	mouse           = mouse,
+	keyboard        = keyboard,
 
-	generateID   = generateID,
-	setHot       = setHot,
-	setActive    = setActive,
-	setKeyFocus  = setKeyFocus,
-	isHot        = isHot,
-	isActive     = isActive,
-	hasKeyFocus  = hasKeyFocus,
-	makeCyclable = makeCyclable,
+	generateID      = generateID,
+	setHot          = setHot,
+	setActive       = setActive,
+	setKeyFocus     = setKeyFocus,
+	isHot           = isHot,
+	isActive        = isActive,
+	hasKeyFocus     = hasKeyFocus,
 
-	style        = require((...):match("(.-)[^%.]+$") .. '.style-default'),
-	color        = color,
-	registerDraw = registerDraw,
-	draw         = draw,
+	disableKeyFocus = disableKeyFocus,
+	clearKeyFocus   = clearKeyFocus,
+	makeCyclable    = makeCyclable,
 
-	strictAnd    = strictAnd,
-	strictOr     = strictOr,
-	save_pack    = save_pack,
-	save_unpack  = save_unpack,
+	style           = require((...):match("(.-)[^%.]+$") .. '.style-default'),
+	color           = color,
+	registerDraw    = registerDraw,
+	draw            = draw,
+
+	strictAnd       = strictAnd,
+	strictOr        = strictOr,
+	save_pack       = save_pack,
+	save_unpack     = save_unpack,
 }

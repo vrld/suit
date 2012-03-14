@@ -17,6 +17,11 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]
 	-- checkboxes have only a `checked' status
 	local checkbox = {checked = false}
 
+	function love.load()
+		-- disable tabbing through the widgets
+		gui.core.disableKeyFocus()
+	end
+
 	function love.update(dt)
 		-- widgets are defined by simply calling them. usually a widget returns true if
 		-- if its value changed or if it was activated (click on button, ...)
@@ -37,8 +42,8 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]
 	end
 
 	function love.keypressed(key,code)
-		-- forward keyboard events to the gui. If you don't want widget tabbing and
-		-- input widgets, skip this line
+		-- forward keyboard events to the gui. If you don't want keyboard support
+		-- skip this line
 		gui.core.keyboard.pressed(key, code)
 	end
 
