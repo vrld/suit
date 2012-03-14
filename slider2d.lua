@@ -1,6 +1,6 @@
 local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
-return function(info, x,y,w,h, draw)
+return function(info, x,y,w,h, widgetHit, draw)
 	assert(type(info) == 'table' and type(info.value) == "table", "Incomplete slider value info")
 	info.min = info.min or {x = 0, y = 0}
 	info.max = info.max or {x = math.max(info.value.x or 0, 1), y = math.max(info.value.y or 0, 1)}
@@ -11,7 +11,7 @@ return function(info, x,y,w,h, draw)
 	}
 
 	local id = core.generateID()
-	core.mouse.updateState(id, x,y,w,h)
+	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
 	core.makeCyclable(id)
 	core.registerDraw(id,draw or core.style.Slider2D, fraction, x,y,w,h)
 

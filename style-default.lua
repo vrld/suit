@@ -10,6 +10,10 @@ if not love.graphics.getFont() then
 	love.graphics.setFont(love.graphics.newFont(12))
 end
 
+local function widgetHit(xx,yy, x,y,w,h)
+	return xx >= x and xx <= x+w and yy >= y and yy <= y+h
+end
+
 local function Button(state, title, x,y,w,h)
 	local c = color[state]
 	love.graphics.setColor(c.bg)
@@ -104,6 +108,7 @@ end
 
 -- the style
 return {
+	widgetHit  = widgetHit,
 	color    = color,
 	Button   = Button,
 	Label    = Label,

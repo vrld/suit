@@ -1,9 +1,9 @@
 local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
-return function(info, x,y, w,h, draw)
+return function(info, x,y, w,h, widgetHit, draw)
 	local id = core.generateID()
 
-	core.mouse.updateState(id, x,y,w,h)
+	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
 	core.makeCyclable(id)
 	core.registerDraw(id, draw or core.style.Checkbox, info.checked,x,y,w,h)
 

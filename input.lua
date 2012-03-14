@@ -1,11 +1,11 @@
 local core = require((...):match("(.-)[^%.]+$") .. 'core')
 
-return function(info, x,y,w,h, draw)
+return function(info, x,y,w,h, widgetHit, draw)
 	info.text = info.text or ""
 	info.cursor = math.min(info.cursor or info.text:len(), info.text:len())
 
 	local id = core.generateID()
-	core.mouse.updateState(id, x,y,w,h)
+	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
 	core.makeCyclable(id)
 	if core.isActive(id) then core.setKeyFocus(id) end
 

@@ -29,12 +29,8 @@ keyboard.cycle = {
 	next = {key = 'tab'},
 }
 
-function mouse.inRect(x,y,w,h)
-	return mouse.x >= x and mouse.x <= x+w and mouse.y >= y and mouse.y <= y+h
-end
-
-function mouse.updateState(id, x,y,w,h)
-	if mouse.inRect(x,y,w,h) then
+function mouse.updateState(id, widgetHit, ...)
+	if widgetHit(mouse.x, mouse.y, ...) then
 		setHot(id)
 		if not context.active and mouse.down then
 			setActive(id)
