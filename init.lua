@@ -24,7 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local BASE = ((...):match('(.+)%.') or ...) .. '.'
+local BASE = (...) .. '.'
+assert(not BASE:match('%.init%.$'), "Invalid require path `"..(...).."' (drop the `.init').")
 
 return {
 	core     = require(BASE .. 'core'),
