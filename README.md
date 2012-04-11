@@ -3,7 +3,7 @@
 Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial inspiration came from the article [Sol on Immediate Mode GUIs (IMGUI)][Sol]. You should check it out to understand how Quickie works.
 
 
-## Example
+# Example
 
 	local gui = require 'quickie'
 
@@ -48,89 +48,80 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
 		gui.core.keyboard.pressed(key, code)
 	end
 
-## Documentation
+# Modules
 
-### Modules
+<dl>
+<dt><code>gui = require 'quickie'</code></dt>
+<dd>Main module. <em>Includes all other modules.</em></dd>
 
-`gui = require 'quickie'`
+<dt><code>gui.core = require 'quickie.core'</code></dt>
+<dd>Core functionality: Input, display, widget internals, ...</dd>
 
-* Main module. Includes all other modules.
+<dt><code>gui.style = require 'quickie.style-default'</code></dt>
+<dd>Default widget style. May be replaced by custom style.</dd>
 
-`gui.core = require 'quickie.core'`
+<dt><code>gui.Button = require 'quickie.button'</code></dt>
+<dd>Button widget.</dd>
 
-* Core functionality: Input, display, widget internals, ...
+<dt><code>gui.Slider = require 'quickie.slider'</code></dt>
+<dd>Slider widget.</dd>
 
-`gui.style = require 'quickie.style-default'`
+<dt><code>gui.Slider2D = require 'quickie.slider2d'</code></dt>
+<dd>2D slider widget.</dd>
 
-* Default widget style. May be replaced by custom style.
+<dt><code>gui.Label = require 'quickie.label'</code></dt>
+<dd>Label widget.</dd>
 
-`gui.Button = require 'quickie.button'`
+<dt><code>gui.Input = require 'quickie.input'</code></dt>
+<dd>Input box widget.</dd>
 
-* Button widget.
+<dt><code>gui.Checkbox = require 'quickie.checkbox'</code></dt>
+<dd>Check box widget.</dd>
+</dl>
 
-`gui.Slider = require 'quickie.slider'`
-
-* Slider widget.
-
-`gui.Slider2D = require 'quickie.slider2d'`
-
-* 2D slider widget.
-
-`gui.Label = require 'quickie.label'`
-
-* Label widget.
-
-`gui.Input = require 'quickie.input'`
-
-* Input box widget.
-
-`gui.Checkbox = require 'quickie.checkbox'`
-
-* Check box widget.
-
-### Widgets
+# Widgets
 
 * Widgets are functions; they should return `true` if the state has changed.
 * Widgets don't manage state. That's your job.
 * Calling a widget function creates the widget for the current frame only.
 * Widgets will be shown using `gui.core.draw()`. See the example above.
 
-#### Button
+## Button
 
 ```lua
 function gui.Button(label, x,y,w,h, widgetHit, draw)
 ```
 
-**Parameters:**
+#### Parameters:
 
 * *string* `label`: Button label.
 * *numbers* `x,y,w,h`: Hit box.
 * *function* `widgetHit`: Custom mouse hit function *(optional)*.
 * *function* `draw`:  Custom widget style *(optional)*.
 
-**Returns:**
+#### Returns:
 
 * `true` if button was activated.
 
-**Hit test function prototype:**
+#### Hit test function signature:
 
 ```lua
 function widgetHit(mouse_x, mouse_y, x,y,w,h)
 ```
 
-**Style function prototype:**
+#### Style function signature:
 
 ```lua
 function draw(state, title, x,y,w,h)
 ```
 
-#### Slider
+## Slider
 
 ```lua
 function gui.Slider(info, x,y,w,h, widgetHit, draw)
 ```
 
-**Parameters:**
+#### Parameters:
 
 * *table* `info`: Widget info table. Fields:
  * *number* `info.value`: The slider value *(required)*.
@@ -142,44 +133,149 @@ function gui.Slider(info, x,y,w,h, widgetHit, draw)
 * *function* `widgetHit`: Custom mouse hit function *(optional)*.
 * *function* `draw`:  Custom widget style *(optional)*.
 
-**Returns:**
+#### Returns:
 
 * `true` if slider value changed.
 
-**Hit test function prototype:**
+#### Hit test function signature:
 
 ```lua
 function widgetHit(mouse_x, mouse_y, x,y,w,h)
 ```
 
-**Style function prototype:**
+#### Style function signature:
 
 ```lua
 function draw(state, fraction, x,y,w,h, vertical)
 ```
 
-#### Slider2D
+## Slider2D
+
+```lua
+function gui.Slider2D(info, x,y,w,h, widgetHit, draw)
+```
+
+#### Parameters:
+
+* *table* `info`: Widget info table. Fields:
+ * *table* `info.value = {x = x, y = y}`: The slider value *(required)*.
+ * *table* `info.min = {x = x, y = y}`: Minimum value *(optional, `default = {x = 0, y = 0}`)*.
+ * *table* `info.max = {x = x, y = y}`: Maximum value *(optional, `default = {x = max(value.x, 1), y = max(value.y, 1)}`)*.
+ * *table* `info.step = {x = x, y = y}`: Step for keyboard input *(optional)*.
+* *numbers* `x,y,w,h`: Hit box.
+* *function* `widgetHit`: Custom mouse hit function *(optional)*.
+* *function* `draw`:  Custom widget style *(optional)*.
+
+#### Returns:
+
+* `true` if slider value changed.
+
+#### Hit test function signature:
+
+```lua
+function widgetHit(mouse_x, mouse_y, x,y,w,h)
+```
+
+#### Style function signature:
+
+```lua
+function draw(state, fraction, x,y,w,h)
+```
+
+**Note:** `fraction = {x = [0..1], y = [0..1]}` is a table argument
+
+## Label
+
+```lua
+function gui.Label(text, x,y,w,h, align, draw)
+```
+
+#### Parameters:
+
+* *string* `text`: Label text.
+* *numbers* `x,y`: Upper left corner of the label's bounding box.
+* *numbers* `w,h`: Width and height of the bounding box *(optional, `default = 0,0`)*.
+* *string* `align`: Text alignment. One of `left`, `center`, `right`. *(optional, `default = 'left'`)*
+* *function* `draw`:  Custom widget style *(optional)*.
+
+#### Returns:
+
+* `false`.
+
+#### Style function signature:
+
+```lua
+function draw(state, text, x,y,w,h, align)
+```
+
+## Input
+
+```lua
+function gui.Input(info, x,y,w,h, widgetHit, draw)
+```
+
+#### Parameters:
+
+* *table* `info`: Widget info table. Fields:
+ * *string* `info.text`: Entered text *(optional `default = ""`)*.
+ * *number* `info.cursor`: Cursor position *(optional `default = info.text:len()`).
+* *numbers* `x,y,w,h`: Hit box.
+* *function* `widgetHit`: Custom mouse hit function *(optional)*.
+* *function* `draw`:  Custom widget style *(optional)*.
+
+#### Returns:
+
+* `true` if textbox value was changed.
+
+#### Hit test function signature:
+
+```lua
+function widgetHit(mouse_x, mouse_y, x,y,w,h)
+```
+
+#### Style function signature:
+
+```lua
+function draw(state, text, cursor, x,y,w,h)
+```
+
+## Checkbox
+
+```lua
+function gui.Checkbox(info, x,y,w,h, widgetHit, draw)
+```
+
+#### Parameters:
+
+* *string* `info`: Widget info table. Fields:
+ * *boolean* `checked`: Whether the box is checked.
+* *numbers* `x,y,w,h`: Hit box.
+* *function* `widgetHit`: Custom mouse hit function *(optional)*.
+* *function* `draw`:  Custom widget style *(optional)*.
+
+#### Returns:
+
+* `true` if box was checked/unchecked.
+
+#### Hit test function signature:
+
+```lua
+function widgetHit(mouse_x, mouse_y, x,y,w,h)
+```
+
+#### Style function signature:
+
+```lua
+function draw(state, checked, x,y,w,h)
+```
+
+
+# Core functions
 
 TODO
 
-#### Label
 
-TODO
-
-#### Input
-
-TODO
-
-#### Checkbox
-
-TODO
-
-### Core functions
-
-TODO
-
-
-## License
+# License
 
 Copyright (c) 2012 Matthias Richter
 
