@@ -79,7 +79,7 @@ local function Slider(state, fraction, x,y,w,h, vertical)
 	love.graphics.rectangle('fill', x,y,hw,hh)
 end
 
-local function Slider2D(state, fraction, x,y,w,h, vertical)
+local function Slider2D(state, fraction, x,y,w,h)
 	local c = color[state]
 	love.graphics.setColor(c.bg)
 	love.graphics.rectangle('fill', x,y,w,h)
