@@ -24,81 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
--- state
-local context = {maxid = 0}
-local draw_items = {n = 0}
 local NO_WIDGET = function()end
+local BASE = (...):match("(.-)[^%.]+$")
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-local function generateID()
-	context.maxid = context.maxid + 1
-	return context.maxid
-end
+--
+-- Helper functions
+--
 
-local function setHot(id) context.hot = id end
-local function isHot(id)  return context.hot == id end
-
-local function setActive(id) context.active = id end
-local function isActive(id)  return context.active == id end
-
-local function setKeyFocus(id) context.keyfocus = id end
-local function hasKeyFocus(id) return context.keyfocus == id end
-
-local function disableKeyFocus() return setKeyFocus{} end
-local function clearKeyFocus() return setKeyFocus(nil) end
-
--- input
-local mouse = {x = 0, y = 0, down = false}
-local keyboard = {key = nil, code = -1}
-keyboard.cycle = {
-	-- binding = {key = key, modifier1, modifier2, ...} XXX: modifiers are OR-ed!
-	prev = {key = 'tab', 'lshift', 'rshift'},
-	next = {key = 'tab'},
-}
-
-function mouse.updateState(id, widgetHit, ...)
-	if widgetHit(mouse.x, mouse.y, ...) then
-		setHot(id)
-		if not context.active and mouse.down then
-			setActive(id)
-		end
-	end
-end
-
-function mouse.releasedOn(id)
-	return not mouse.down and isHot(id) and isActive(id)
-end
-
-function keyboard.pressed(key, code)
-	keyboard.key = key
-	keyboard.code = code
-end
-
-function keyboard.tryGrab(id)
-	if not context.keyfocus then
-		setKeyFocus(id)
-	end
-end
-
-function keyboard.isBindingDown(bind)
-	local modifiersDown = #bind == 0 or love.keyboard.isDown(unpack(bind))
-	return keyboard.key == bind.key and modifiersDown
-end
-
-local function makeCyclable(id)
-	keyboard.tryGrab(id)
-	if hasKeyFocus(id) then
-		if keyboard.isBindingDown(keyboard.cycle.prev) then
-			setKeyFocus(context.lastwidget)
-			keyboard.key = nil
-		elseif keyboard.isBindingDown(keyboard.cycle.next) then
-			setKeyFocus(nil)
-			keyboard.key = nil
-		end
-	end
-	context.lastwidget = id
-end
-
--- helper functions
+-- evaluates all arguments
 local function strictAnd(...)
 	local n = select("#", ...)
 	local ret = true
@@ -124,66 +60,76 @@ local function save_unpack(t, i)
 	return t[i], save_unpack(t, i+1)
 end
 
+--
+-- Widget ID
+--
+local maxid = 0
+local function generateID()
+	maxid = maxid + 1
+	return maxid
+end
+
+--
+-- Drawing / Frame update
+--
+local draw_items = {n = 0}
 local function registerDraw(id, f, ...)
 	assert(type(f) == 'function' or (getmetatable(f) or {}).__call,
 	       'Drawing function is not a callable type!')
 
+	local font = love.graphics.getFont()
+
 	local state = 'normal'
-	if isHot(id) or hasKeyFocus(id) then
-		state = isActive(id) and 'active' or 'hot'
+	if mouse.isHot(id) or keyboard.hasFocus(id) then
+		state = mouse.isActive(id) and 'active' or 'hot'
 	end
 	local rest = save_pack(...)
 	draw_items.n = draw_items.n + 1
-	draw_items[draw_items.n] = function() f(state, save_unpack(rest)) end
+	draw_items[draw_items.n] = function()
+		if font then love.graphics.setFont(font) end
+		f(state, save_unpack(rest))
+	end
 end
 
 -- actually update-and-draw
 local function draw()
-	-- close frame state
-	if not mouse.down then -- released
-		setActive(nil)
-	elseif not context.active then -- clicked outside
-		setActive(NO_WIDGET)
-	end
+	keyboard.endFrame()
+	mouse.endFrame()
+	group.endFrame()
+
+	-- save graphics state
+	local c = {love.graphics.getColor()}
+	local f = love.graphics.getFont()
+	local lw = love.graphics.getLineWidth()
+	local ls = love.graphics.getLineStyle()
 
 	for i = 1,draw_items.n do draw_items[i]() end
 
-	-- prepare for next frame
+	-- restore graphics state
+	love.graphics.setLine(lw, ls)
+	if f then love.graphics.setFont(f) end
+	love.graphics.setColor(c)
+
 	draw_items.n = 0
-	context.maxid = 0
+	maxid = 0
 
-	-- update mouse status
-	setHot(nil)
-	mouse.x, mouse.y = love.mouse.getPosition()
-	mouse.down = love.mouse.isDown('l')
-
-	keyboard.key, keyboard.code = nil, -1
+	group.beginFrame()
+	mouse.beginFrame()
+	keyboard.beginFrame()
 end
 
+--
+-- The Module
+--
 return {
-	mouse           = mouse,
-	keyboard        = keyboard,
+	generateID   = generateID,
 
-	generateID      = generateID,
-	setHot          = setHot,
-	setActive       = setActive,
-	setKeyFocus     = setKeyFocus,
-	isHot           = isHot,
-	isActive        = isActive,
-	hasKeyFocus     = hasKeyFocus,
+	style        = require((...):match("(.-)[^%.]+$") .. 'style-default'),
+	registerDraw = registerDraw,
+	draw         = draw,
 
-	disableKeyFocus = disableKeyFocus,
-	enableKeyFocus  = clearKeyFocus,
-	clearKeyFocus   = clearKeyFocus,
-	makeCyclable    = makeCyclable,
-
-	style           = require((...):match("(.-)[^%.]+$") .. '.style-default'),
-	color           = color,
-	registerDraw    = registerDraw,
-	draw            = draw,
-
-	strictAnd       = strictAnd,
-	strictOr        = strictOr,
-	save_pack       = save_pack,
-	save_unpack     = save_unpack,
+	strictAnd    = strictAnd,
+	strictOr     = strictOr,
+	save_pack    = save_pack,
+	save_unpack  = save_unpack,
 }

@@ -24,47 +24,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local core = require((...):match("(.-)[^%.]+$") .. 'core')
+local BASE = (...):match("(.-)[^%.]+$")
+local core     = require(BASE .. 'core')
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-return function(info, x,y,w,h, widgetHit, draw)
-	info.text = info.text or ""
-	info.cursor = math.min(info.cursor or info.text:len(), info.text:len())
+-- {info = {text = "", cursor = text:len()}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+return function(w)
+	assert(type(w) == "table" and type(w.info) == "table", "Invalid argument")
+	w.info.text = w.info.text or ""
+	w.info.cursor = math.min(w.info.cursor or w.info.text:len(), w.info.text:len())
 
 	local id = core.generateID()
-	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
-	core.makeCyclable(id)
-	if core.isActive(id) then core.setKeyFocus(id) end
-
-	core.registerDraw(id, draw or core.style.Input, info.text, info.cursor, x,y,w,h)
-	if not core.hasKeyFocus(id) then return false end
+	local pos, size = group.getRect(w.pos, w.size)
+	mouse.updateWidget(id, pos, size, w.widgetHit)
+	keyboard.makeCyclable(id)
+	if mouse.isActive(id) then keyboard.setFocus(id) end
 
 	local changed = false
+	if not keyboard.hasFocus(id) then
+		--[[nothing]]
 	-- editing
-	if core.keyboard.key == 'backspace' then
-		info.text = info.text:sub(1,info.cursor-1) .. info.text:sub(info.cursor+1)
-		info.cursor = math.max(0, info.cursor-1)
+	elseif keyboard.key == 'backspace' then
+		w.info.text = w.info.text:sub(1,w.info.cursor-1) .. w.info.text:sub(w.info.cursor+1)
+		w.info.cursor = math.max(0, w.info.cursor-1)
 		changed = true
-	elseif core.keyboard.key == 'delete' then
-		info.text = info.text:sub(1,info.cursor) .. info.text:sub(info.cursor+2)
-		info.cursor = math.min(info.text:len(), info.cursor)
+	elseif keyboard.key == 'delete' then
+		w.info.text = w.info.text:sub(1,w.info.cursor) .. w.info.text:sub(w.info.cursor+2)
+		w.info.cursor = math.min(w.info.text:len(), w.info.cursor)
 		changed = true
 	-- movement
-	elseif core.keyboard.key == 'left' then
-		info.cursor = math.max(0, info.cursor-1)
-	elseif core.keyboard.key == 'right' then
-		info.cursor = math.min(info.text:len(), info.cursor+1)
-	elseif core.keyboard.key == 'home' then
-		info.cursor = 0
-	elseif core.keyboard.key == 'end' then
-		info.cursor = info.text:len()
-	-- input
-	elseif core.keyboard.code >= 32 and core.keyboard.code < 127 then
-		local left = info.text:sub(1,info.cursor)
-		local right =  info.text:sub(info.cursor+1)
-		info.text = table.concat{left, string.char(core.keyboard.code), right}
-		info.cursor = info.cursor + 1
+	elseif keyboard.key == 'left' then
+		w.info.cursor = math.max(0, w.info.cursor-1)
+	elseif keyboard.key == 'right' then
+		w.info.cursor = math.min(w.info.text:len(), w.info.cursor+1)
+	elseif keyboard.key == 'home' then
+		w.info.cursor = 0
+	elseif keyboard.key == 'end' then
+		w.info.cursor = w.info.text:len()
+	-- info
+	elseif keyboard.code >= 32 and keyboard.code < 127 then
+		local left = w.info.text:sub(1,w.info.cursor)
+		local right =  w.info.text:sub(w.info.cursor+1)
+		w.info.text = table.concat{left, string.char(keyboard.code), right}
+		w.info.cursor = w.info.cursor + 1
 		changed = true
 	end
+
+	core.registerDraw(id, w.draw or core.style.Input,
+		w.info.text, w.info.cursor, pos[1],pos[2], size[1],size[2])
 
 	return changed
 end

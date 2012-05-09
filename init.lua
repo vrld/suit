@@ -29,6 +29,9 @@ assert(not BASE:match('%.init%.$'), "Invalid require path `"..(...).."' (drop th
 
 return {
 	core     = require(BASE .. 'core'),
+	group    = require(BASE .. 'group'),
+	mouse    = require(BASE .. 'mouse'),
+	keyboard = require(BASE .. 'keyboard'),
 	Button   = require(BASE .. 'button'),
 	Slider   = require(BASE .. 'slider'),
 	Slider2D = require(BASE .. 'slider2d'),

@@ -23,22 +23,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
-local core = require((...):match("(.-)[^%.]+$") .. 'core')
+local BASE = (...):match("(.-)[^%.]+$")
+local core     = require(BASE .. 'core')
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-return function(info, x,y, w,h, widgetHit, draw)
-	local id = core.generateID()
+-- {info = {checked = status, label = "", algin = "left"}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+return function(w)
+	assert(type(w) == "table")
+	w.info.label = w.info.label or ""
 
-	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
-	core.makeCyclable(id)
-	core.registerDraw(id, draw or core.style.Checkbox, info.checked,x,y,w,h)
-
-	local checked = info.checked
-	local key = core.keyboard.key
-	if core.mouse.releasedOn(id) or
-		(core.hasKeyFocus(id) and key == 'return' or key == ' ') then
-		info.checked = not info.checked
+	local tight = w.size and (w.size[1] == 'tight' or w.size[2] == 'tight')
+	if tight then
+		local f = assert(love.graphics.getFont())
+		if w.size[1] == 'tight' then
+			w.size[1] = f:getWidth(w.info.label)
+		end
+		if w.size[2] == 'tight' then
+			w.size[2] = f:getHeight(w.info.label)
+		end
+		-- account for the checkbox
+		local bw = math.min(w.size[1] or group.size[1], w.size[2] or group.size[2])
+		w.size[1] = w.size[1] + bw + 4
 	end
 
-	return info.checked ~= checked
+	local id = core.generateID()
+	local pos, size = group.getRect(w.pos, w.size)
+
+	mouse.updateWidget(id, pos, size, w.widgetHit)
+	keyboard.makeCyclable(id)
+
+	local checked = w.info.checked
+	local key = keyboard.key
+	if mouse.releasedOn(id) or ((key == 'return' or key == ' ') and keyboard.hasFocus(id)) then
+		w.info.checked = not w.info.checked
+	end
+
+	core.registerDraw(id, w.draw or core.style.Checkbox,
+		w.info.checked, w.info.label, w.info.align or 'left', pos[1], pos[2], size[1], size[2])
+
+	return w.info.checked ~= checked
 end
 

@@ -24,47 +24,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local core = require((...):match("(.-)[^%.]+$") .. 'core')
+local BASE = (...):match("(.-)[^%.]+$")
+local core     = require(BASE .. 'core')
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-return function(info, x,y,w,h, widgetHit, draw)
-	assert(type(info) == 'table' and info.value, "Incomplete slider value info")
-	info.min = info.min or 0
-	info.max = info.max or math.max(info.value, 1)
-	info.step = info.step or (info.max - info.min) / 50
-	local fraction = (info.value - info.min) / (info.max - info.min)
+-- {info = {value = v, min = 0, max = 1, step = (max-min)/20}, vertical = boolean, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+return function(w)
+	assert(type(w) == 'table' and type(w.info) == "table" and w.info.value, "Invalid argument.")
+	w.info.min = w.info.min or 0
+	w.info.max = w.info.max or math.max(w.info.value, 1)
+	w.info.step = w.info.step or (w.info.max - w.info.min) / 20
+	local fraction = (w.info.value - w.info.min) / (w.info.max - w.info.min)
 
 	local id = core.generateID()
-	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
-	core.makeCyclable(id)
-	core.registerDraw(id,draw or core.style.Slider, fraction, x,y,w,h, info.vertical)
+	local pos, size = group.getRect(w.pos, w.info.size)
+
+	mouse.updateWidget(id, pos, size, w.widgetHit)
+	keyboard.makeCyclable(id)
 
 	-- mouse update
-	if core.isActive(id) then
-		core.setKeyFocus(id)
-		if info.vertical then
-			fraction = math.min(1, math.max(0, (y - core.mouse.y + h) / h))
+	local changed = false
+	if mouse.isActive(id) then
+		keyboard.setFocus(id)
+		if w.vertical then
+			fraction = math.min(1, math.max(0, (pos[2] - mouse.y + size[2]) / size[2]))
 		else
-			fraction = math.min(1, math.max(0, (core.mouse.x - x) / w))
+			fraction = math.min(1, math.max(0, (mouse.x - pos[1]) / size[1]))
 		end
-		local v = fraction * (info.max - info.min) + info.min
-		if v ~= info.value then
-			info.value = v
-			return true
+		local v = fraction * (w.info.max - w.info.min) + w.info.min
+		if v ~= w.info.value then
+			w.info.value = v
+			changed = true
 		end
 	end
 
 	-- keyboard update
-	local changed = false
-	if core.hasKeyFocus(id) then
-		local keys = info.vertical and {'up', 'down'} or {'right', 'left'}
-		if core.keyboard.key == keys[1] then
-			info.value = math.min(info.max, info.value + info.step)
+	if keyboard.hasFocus(id) then
+		local keys = w.vertical and {'up', 'down'} or {'right', 'left'}
+		if keyboard.key == keys[1] then
+			w.info.value = math.min(w.info.max, w.info.value + w.info.step)
 			changed = true
-		elseif core.keyboard.key == keys[2] then
-			info.value = math.max(info.min, info.value - info.step)
+		elseif keyboard.key == keys[2] then
+			w.info.value = math.max(w.info.min, w.info.value - w.info.step)
 			changed = true
 		end
 	end
+
+	core.registerDraw(id, w.draw or core.style.Slider,
+		fraction, w.vertical, pos[1],pos[2], size[1],size[2])
 
 	return changed
 end

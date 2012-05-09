@@ -24,58 +24,76 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local core = require((...):match("(.-)[^%.]+$") .. 'core')
+local BASE = (...):match("(.-)[^%.]+$")
+local core     = require(BASE .. 'core')
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-return function(info, x,y,w,h, widgetHit, draw)
-	assert(type(info) == 'table' and type(info.value) == "table", "Incomplete slider value info")
-	info.min = info.min or {x = 0, y = 0}
-	info.max = info.max or {x = math.max(info.value.x or 0, 1), y = math.max(info.value.y or 0, 1)}
-	info.step = info.step or {x = (info.max.x - info.min.x)/50, y = (info.max.y - info.min.y)/50}
+-- {info = {value = {x,y}, min = {0,0}, max = {1,1}, step = (max-min)/20}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+return function(w)
+	assert(type(w) == 'table' and type(w.info) == "table" and w.info.value, "Invalid argument.")
+	w.info.min = {
+		w.info.min and w.info.min[1] or 0,
+		w.info.min and w.info.min[2] or 0,
+	}
+	w.info.max = {
+		w.info.max and w.info.max[1] or math.max(1, w.info.value[1]),
+		w.info.max and w.info.max[2] or math.max(1, w.info.value[2]),
+	}
+	w.info.step = {
+		w.info.step and w.info.step[1] or (w.info.max[1] - w.info.min[1]) / 20,
+		w.info.step and w.info.step[2] or (w.info.max[2] - w.info.min[2]) / 20,
+	}
+
 	local fraction = {
-		x = (info.value.x - info.min.x) / (info.max.x - info.min.x),
-		y = (info.value.y - info.min.y) / (info.max.y - info.min.y),
+		(w.info.value[1] - w.info.min[1]) / (w.info.max[1] - w.info.min[1]),
+		(w.info.value[2] - w.info.min[2]) / (w.info.max[2] - w.info.min[2]),
 	}
 
 	local id = core.generateID()
-	core.mouse.updateState(id, widgetHit or core.style.widgetHit, x,y,w,h)
-	core.makeCyclable(id)
-	core.registerDraw(id,draw or core.style.Slider2D, fraction, x,y,w,h)
+	local pos, size = group.getRect(w.pos, w.size)
+
+	mouse.updateWidget(id, pos, size, w.widgetHit)
+	keyboard.makeCyclable(id)
 
 	-- update value
-	if core.isActive(id) then
-		core.setKeyFocus(id)
+	local changed = false
+	if mouse.isActive(id) then
+		keyboard.setFocus(id)
 		fraction = {
-			x = (core.mouse.x - x) / w,
-			y = (core.mouse.y - y) / h,
+			math.min(1, math.max(0, (mouse.x - pos[1]) / size[1])),
+			math.min(1, math.max(0, (mouse.y - pos[2]) / size[2])),
 		}
-		fraction.x = math.min(1, math.max(0, fraction.x))
-		fraction.y = math.min(1, math.max(0, fraction.y))
 		local v = {
-			x = fraction.x * (info.max.x - info.min.x) + info.min.x,
-			y = fraction.y * (info.max.y - info.min.y) + info.min.y,
+			fraction[1] * (w.info.max[1] - w.info.min[1]) + w.info.min[1],
+			fraction[2] * (w.info.max[2] - w.info.min[2]) + w.info.min[2],
 		}
-		if v.x ~= info.value.x or v.y ~= info.value.y then
-			info.value = v
-			return true
+		if v[1] ~= w.info.value[1] or v[2] ~= w.info.value[2] then
+			w.info.value = v
+			changed = true
 		end
 	end
 
-	local changed = false
-	if core.hasKeyFocus(id) then
-		if core.keyboard.key == 'down' then
-			info.value.y = math.min(info.max.y, info.value.y + info.step.y)
+	if keyboard.hasFocus(id) then
+		if keyboard.key == 'down' then
+			w.info.value[2] = math.min(w.info.max[2], w.info.value[2] + w.info.step.y)
 			changed = true
-		elseif core.keyboard.key == 'up' then
-			info.value.y = math.max(info.min.y, info.value.y - info.step.y)
+		elseif keyboard.key == 'up' then
+			w.info.value[2] = math.max(w.info.min[2], w.info.value[2] - w.info.step.y)
 			changed = true
 		end
-		if core.keyboard.key == 'right' then
-			info.value.x = math.min(info.max.x, info.value.x + info.step.x)
+		if keyboard.key == 'right' then
+			w.info.value[1] = math.min(w.info.max[1], w.info.value[1] + w.info.step.x)
 			changed = true
-		elseif core.keyboard.key == 'left' then
-			info.value.x = math.max(info.min.x, info.value.x - info.step.x)
+		elseif keyboard.key == 'left' then
+			w.info.value[1] = math.max(w.info.min[1], w.info.value[1] - w.info.step.x)
 			changed = true
 		end
 	end
+
+	core.registerDraw(id, w.draw or core.style.Slider2D,
+		fraction, pos[1],pos[2], size[1],size[2])
+
 	return changed
 end

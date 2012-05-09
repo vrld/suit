@@ -24,12 +24,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local core = require((...):match("(.-)[^%.]+$") .. 'core')
+local BASE = (...):match("(.-)[^%.]+$")
+local core     = require(BASE .. 'core')
+local group    = require(BASE .. 'group')
+local mouse    = require(BASE .. 'mouse')
+local keyboard = require(BASE .. 'keyboard')
 
-return function(text, x,y,w,h,align, draw)
+-- {text = text, align = align,  pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+return function(w)
+	assert(type(w) == "table" and w.text, "Invalid argument")
+	w.align = w.align or 'left'
+
+	local tight = w.size and (w.size[1] == 'tight' or w.size[2] == 'tight')
+	if tight then
+		local f = assert(love.graphics.getFont())
+		if w.size[1] == 'tight' then
+			w.size[1] = f:getWidth(w.text)
+		end
+		if w.size[2] == 'tight' then
+			w.size[2] = f:getHeight(w.text)
+		end
+	end
+
 	local id = core.generateID()
-	w, h, align = w or 0, h or 0, align or 'left'
-	core.registerDraw(id, draw or core.style.Label,  text,x,y,w,h,align)
-	return false
+	local pos, size = group.getRect(w.pos, w.size)
+
+	if keyboard.hasFocus(id) then
+		keyboard.clearFocus()
+	end
+
+	core.registerDraw(id, draw or core.style.Label,
+		w.text, w.align, pos[1],pos[2], size[1],size[2])
+
+	return mouse.releasedOn(id)
 end
 
