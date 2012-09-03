@@ -29,6 +29,7 @@ local _M -- holds the module. needed to make widgetHit overridable
 local x,y = 0,0
 local down = false
 local hot, active = nil, nil
+local NO_WIDGET = {}
 
 local function widgetHit(mouse, pos, size)
 	return mouse[1] >= pos[1] and mouse[1] <= pos[1] + size[1] and

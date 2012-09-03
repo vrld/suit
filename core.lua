@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local NO_WIDGET = function()end
 local BASE = (...):match("(.-)[^%.]+$")
 local group    = require(BASE .. 'group')
 local mouse    = require(BASE .. 'mouse')
@@ -83,6 +82,7 @@ local function registerDraw(id, f, ...)
 	if mouse.isHot(id) or keyboard.hasFocus(id) then
 		state = mouse.isActive(id) and 'active' or 'hot'
 	end
+	print(id, keyboard.hasFocus(id))
 	local rest = save_pack(...)
 	draw_items.n = draw_items.n + 1
 	draw_items[draw_items.n] = function()

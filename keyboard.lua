@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 local key,code = nil, -1
 local focus, lastwidget
+local NO_WIDGET = {}
 
 local cycle = {
 	-- binding = {key = key, modifier1, modifier2, ...} XXX: modifiers are OR-ed!
