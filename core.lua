@@ -82,7 +82,6 @@ local function registerDraw(id, f, ...)
 	if mouse.isHot(id) or keyboard.hasFocus(id) then
 		state = mouse.isActive(id) and 'active' or 'hot'
 	end
-	print(id, keyboard.hasFocus(id))
 	local rest = save_pack(...)
 	draw_items.n = draw_items.n + 1
 	draw_items[draw_items.n] = function()
