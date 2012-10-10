@@ -70,6 +70,18 @@ local function endFrame()
 	end
 end
 
+local function disable()
+	--_M.beginFrame = nothing
+	--_M.endFrame   = nothing
+	--_M.isHot      = isHot,
+	--_M.isActive   = isActive,
+	_M.updateWidget = function() end
+end
+
+local function enable()
+	_M.updateWidget = updateWidget
+end
+
 _M = {
 	widgetHit    = widgetHit,
 	setHot       = setHot,
@@ -81,6 +93,9 @@ _M = {
 
 	beginFrame   = beginFrame,
 	endFrame     = endFrame,
+
+	disable      = disable,
+	enable       = enable,
 }
 
 -- metatable provides getters to x, y and down
