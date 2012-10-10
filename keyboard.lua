@@ -36,7 +36,7 @@ local cycle = {
 
 local function pressed(...)   key, code = ... end
 local function setFocus(id)   focus = id end
-local function disableFocus() focus = NO_WIDGET end
+local function disable()      focus = NO_WIDGET end
 local function clearFocus()   focus = nil end
 local function hasFocus(id)   return id == focus end
 
@@ -79,11 +79,12 @@ return setmetatable({
 	tryGrab       = tryGrab,
 	isBindingDown = isBindingDown,
 	setFocus      = setFocus,
-	disableFocus  = disableFocus,
-	enableFocus   = clearFocus,
 	clearFocus    = clearFocus,
 	hasFocus      = hasFocus,
 	makeCyclable  = makeCyclable,
+
+	disable       = disable,
+	enable        = clearFocus,
 
 	beginFrame   = beginFrame,
 	endFrame     = endFrame,
