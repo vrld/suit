@@ -40,6 +40,7 @@ local function setHot(id)    hot = id end
 local function setActive(id) active = id end
 local function isHot(id)     return id == hot end
 local function isActive(id)  return id == active end
+local function getHot()      return hot end
 
 local function updateWidget(id, pos, size, hit)
 	hit = hit or _M.widgetHit
@@ -85,6 +86,7 @@ end
 _M = {
 	widgetHit    = widgetHit,
 	setHot       = setHot,
+	getHot       = getHot,
 	setActive    = setActive,
 	isHot        = isHot,
 	isActive     = isActive,

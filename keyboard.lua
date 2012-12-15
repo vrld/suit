@@ -34,11 +34,12 @@ local cycle = {
 	next = {key = 'tab'},
 }
 
-local function pressed(...)   key, code = ... end
-local function setFocus(id)   focus = id end
-local function disable()      focus = NO_WIDGET end
-local function clearFocus()   focus = nil end
-local function hasFocus(id)   return id == focus end
+local function pressed(...) key, code = ... end
+local function setFocus(id) focus = id end
+local function disable()    focus = NO_WIDGET end
+local function clearFocus() focus = nil end
+local function hasFocus(id) return id == focus end
+local function getFocus()   return focus end
 
 local function tryGrab(id)
 	if not focus then
@@ -79,6 +80,7 @@ return setmetatable({
 	tryGrab       = tryGrab,
 	isBindingDown = isBindingDown,
 	setFocus      = setFocus,
+	getFocus      = getFocus,
 	clearFocus    = clearFocus,
 	hasFocus      = hasFocus,
 	makeCyclable  = makeCyclable,
