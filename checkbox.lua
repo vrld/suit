@@ -29,19 +29,19 @@ local group    = require(BASE .. 'group')
 local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
 
--- {info = {checked = status, label = "", algin = "left"}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+-- {checked = status, text = "", algin = "left", pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
 return function(w)
 	assert(type(w) == "table")
-	w.info.label = w.info.label or ""
+	w.text = w.text or ""
 
 	local tight = w.size and (w.size[1] == 'tight' or w.size[2] == 'tight')
 	if tight then
 		local f = assert(love.graphics.getFont())
 		if w.size[1] == 'tight' then
-			w.size[1] = f:getWidth(w.info.label)
+			w.size[1] = f:getWidth(w.text)
 		end
 		if w.size[2] == 'tight' then
-			w.size[2] = f:getHeight(w.info.label)
+			w.size[2] = f:getHeight(w.text)
 		end
 		-- account for the checkbox
 		local bw = math.min(w.size[1] or group.size[1], w.size[2] or group.size[2])
@@ -54,15 +54,15 @@ return function(w)
 	mouse.updateWidget(id, pos, size, w.widgetHit)
 	keyboard.makeCyclable(id)
 
-	local checked = w.info.checked
+	local checked = w.checked
 	local key = keyboard.key
 	if mouse.releasedOn(id) or ((key == 'return' or key == ' ') and keyboard.hasFocus(id)) then
-		w.info.checked = not w.info.checked
+		w.checked = not w.checked
 	end
 
 	core.registerDraw(id, w.draw or core.style.Checkbox,
-		w.info.checked, w.info.label, w.info.align or 'left', pos[1], pos[2], size[1], size[2])
+		w.checked, w.text, w.align or 'left', pos[1], pos[2], size[1], size[2])
 
-	return w.info.checked ~= checked
+	return w.checked ~= checked
 end
 
