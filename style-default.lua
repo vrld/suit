@@ -26,9 +26,6 @@ THE SOFTWARE.
 
 -- default style
 local color = {
---	normal = {bg = {180,180,180}, fg = {48,48,48},  border={100,100,100}},
---	hot    = {bg = {215,215,215}, fg = {52,65,160}, border={100,100,100}},
---	active = {bg = {230,230,230}, fg = {69,84,201}, border={100,100,100}}
 	normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
 	hot    = {bg = {98,98,98}, fg = {69,201,84},   border={30,30,30}},
 	active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
@@ -116,8 +113,8 @@ local function Slider2D(state, fraction, x,y,w,h)
 	local xx = math.ceil(x + fraction[1] * w)
 	local yy = math.ceil(y + fraction[2] * h)
 	love.graphics.setColor(c.fg)
-	love.graphics.line(xx-3,yy,xx+2,yy)
-	love.graphics.line(xx,yy-3,xx,yy+2)
+	love.graphics.line(xx-3,yy,xx+2.5,yy)
+	love.graphics.line(xx,yy-2.5,xx,yy+2.5)
 end
 
 local function Input(state, text, cursor, x,y,w,h)
