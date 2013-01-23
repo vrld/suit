@@ -48,7 +48,7 @@ return function(w)
 		w.size[1] = w.size[1] + bw + 4
 	end
 
-	local id = core.generateID()
+	local id = w.id or core.generateID()
 	local pos, size = group.getRect(w.pos, w.size)
 
 	mouse.updateWidget(id, pos, size, w.widgetHit)

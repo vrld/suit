@@ -65,10 +65,15 @@ end
 --
 -- Widget ID
 --
-local maxid = 0
+local maxid, uids = 0, {}
+setmetatable(uids, {__index = function(t, i)
+	t[i] = {}
+	return t[i]
+end})
+
 local function generateID()
 	maxid = maxid + 1
-	return maxid
+	return uids[maxid]
 end
 
 --

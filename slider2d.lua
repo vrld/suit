@@ -51,7 +51,7 @@ return function(w)
 		(w.info.value[2] - w.info.min[2]) / (w.info.max[2] - w.info.min[2]),
 	}
 
-	local id = core.generateID()
+	local id = w.id or core.generateID()
 	local pos, size = group.getRect(w.pos, w.size)
 
 	mouse.updateWidget(id, pos, size, w.widgetHit)

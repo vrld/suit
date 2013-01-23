@@ -38,7 +38,7 @@ return function(w)
 	w.info.step = w.info.step or (w.info.max - w.info.min) / 20
 	local fraction = (w.info.value - w.info.min) / (w.info.max - w.info.min)
 
-	local id = core.generateID()
+	local id = w.id or core.generateID()
 	local pos, size = group.getRect(w.pos, w.info.size)
 
 	mouse.updateWidget(id, pos, size, w.widgetHit)

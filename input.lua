@@ -36,7 +36,7 @@ return function(w)
 	w.info.text = w.info.text or ""
 	w.info.cursor = math.min(w.info.cursor or w.info.text:len(), w.info.text:len())
 
-	local id = core.generateID()
+	local id = w.id or core.generateID()
 	local pos, size = group.getRect(w.pos, w.size)
 	mouse.updateWidget(id, pos, size, w.widgetHit)
 	keyboard.makeCyclable(id)
