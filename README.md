@@ -30,14 +30,14 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
         foo   = false,
         demo  = false
     }
-    local check1   = {checked = false, label = "Checkbox"}
-    local check2   = {checked = false, label = "Another one"}
+    local check1   = false
+    local check2   = false
     local input    = {text = ""}
     local slider   = {value = .5}
     local slider2d = {value = {.5,.5}}
     function love.update(dt)
         gui.group.push{grow = "down", pos = {5,5}}
-        if gui.Button{text = "Menu"} then
+        if gui.Checkbox{checked = menu_open.main, text = "Show Menu"} then
             menu_open.main = not menu_open.main
         end
 
@@ -70,47 +70,53 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
         gui.group.pop{}
 
         if menu_open.demo then
-            gui.group.push{grow = "down", pos = {200, 80}}
+            gui.group{grow = "down", pos = {200, 80}, function()
 
-            love.graphics.setFont(fonts[20])
-            gui.Label{text = "Widgets"}
-            love.graphics.setFont(fonts[12])
-            gui.group.push{grow = "right"}
-            gui.Button{text = "Button"}
-            gui.Button{text = "Tight Button", size = {"tight"}}
-            gui.Button{text = "Tight² Button", size = {"tight", "tight"}}
-            gui.group.pop{}
+                love.graphics.setFont(fonts[20])
+                gui.Label{text = "Widgets"}
+                love.graphics.setFont(fonts[12])
+                gui.group.push{grow = "right", function()
+                    gui.Button{text = "Button"}
+                    gui.Button{text = "Tight Button", size = {"tight"}}
+                    gui.Button{text = "Tight² Button", size = {"tight", "tight"}}
+                end}
 
-            gui.group.push{grow = "right"}
-            gui.Button{text = "", size = {2}}
-            gui.Label{text = "Tight Label", size = {"tight"}}
-            gui.Button{text = "", size = {2}}
-            gui.Label{text = "Center Label", align = "center"}
-            gui.Button{text = "", size = {2}}
-            gui.Label{text = "Another Label"}
-            gui.Button{text = "", size = {2}}
-            gui.group.pop{}
+                gui.group.push{grow = "right", function()
+                    gui.Button{text = "", size = {2}} -- acts as separator
+                    gui.Label{text = "Tight Label", size = {"tight"}}
+                    gui.Button{text = "", size = {2}}
+                    gui.Label{text = "Center Label", align = "center"}
+                    gui.Button{text = "", size = {2}}
+                    gui.Label{text = "Another Label"}
+                    gui.Button{text = "", size = {2}}
+                end}
 
-            gui.group.push{grow = "right"}
-            gui.Checkbox{info = check1, size = {"tight"}}
-            gui.Checkbox{info = check2}
-            gui.group.pop{}
+                gui.group.push{grow = "right"}
+                if gui.Checkbox{checkbox = check1, text = "Checkbox", size = {"tight"}} then
+                    check1 = not check1
+                if gui.Checkbox{checkbox = check2, text = "Another Checkbox"} then
+                    check2 = not check2
+                end
+                if gui.Checkbox{checkbox = check2, text = "Linked Checkbox"} then
+                    check2 = not check2
+                end
+                gui.group.pop{}
 
-            gui.group.push{grow = "right"}
-            gui.Label{text = "Input", size = {70}}
-            gui.Input{info = input, size = {300}}
-            gui.group.pop{}
+                gui.group.push{grow = "right", function()
+                    gui.Label{text = "Input", size = {70}}
+                    gui.Input{info = input, size = {300}}
+                end}
 
-            gui.group.push{grow = "right"}
-            gui.Label{text = "Slider", size = {70}}
-            gui.Slider{info = slider}
-            gui.Label{text = ("Value: %.2f"):format(slider.value), size = {70}}
-            gui.group.pop{}
+                gui.group.push{grow = "right", function()
+                    gui.Label{text = "Slider", size = {70}}
+                    gui.Slider{info = slider}
+                    gui.Label{text = ("Value: %.2f"):format(slider.value), size = {70}}
+                end}
 
-            gui.Label{text = "2D Slider", pos = {nil,10}}
-            gui.Slider2D{info = slider2d, size = {250, 250}}
-            gui.Label{text = ("Value: %.2f, %.2f"):format(slider2d.value[1], slider2d.value[2])}
-
+                gui.Label{text = "2D Slider", pos = {nil,10}}
+                gui.Slider2D{info = slider2d, size = {250, 250}}
+                gui.Label{text = ("Value: %.2f, %.2f"):format(slider2d.value[1], slider2d.value[2])}
+            end}
         end
     end
 
