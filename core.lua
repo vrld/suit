@@ -53,10 +53,13 @@ local function save_pack(...)
 	return {n = select('#', ...), ...}
 end
 
-local function save_unpack(t, i)
-	i = i or 1
-	if i >= t.n then return t[i] end
-	return t[i], save_unpack(t, i+1)
+local function save_unpack_helper(t, i, ...)
+	if i <= 0 then return ... end
+	return save_unpack_helper(t, i-1, t[i], ...)
+end
+
+local function save_unpack(t)
+	return save_unpack_helper(t, t.n)
 end
 
 --
