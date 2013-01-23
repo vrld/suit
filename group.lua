@@ -138,6 +138,14 @@ return setmetatable({
 	beginFrame = beginFrame,
 	endFrame   = endFrame,
 	default    = default,
-}, {__index = function(_,k) 
-	return ({size = current.size, pos = current.pos})[k]
-end})
+}, {
+	__index = function(_,k)
+		return ({size = current.size, pos = current.pos})[k]
+	end,
+	__call = function(_, info)
+		assert(type(info) == 'table' and type(info[1]) == 'function')
+		push(info)
+		info[1]()
+		pop()
+	end,
+})
