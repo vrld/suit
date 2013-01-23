@@ -30,6 +30,7 @@ local x,y = 0,0
 local down = false
 local hot, active = nil, nil
 local NO_WIDGET = {}
+local function _NOP_() end
 
 local function widgetHit(mouse, pos, size)
 	return mouse[1] >= pos[1] and mouse[1] <= pos[1] + size[1] and
@@ -72,14 +73,14 @@ local function endFrame()
 end
 
 local function disable()
-	--_M.beginFrame = nothing
-	--_M.endFrame   = nothing
-	--_M.isHot      = isHot,
-	--_M.isActive   = isActive,
-	_M.updateWidget = function() end
+	_M.beginFrame   = _NOP__
+	_M.endFrame     = _NOP__
+	_M.updateWidget = _NOP__
 end
 
 local function enable()
+	_M.beginFrame   = beginFrame
+	_M.endFrame     = endFrame
 	_M.updateWidget = updateWidget
 end
 
