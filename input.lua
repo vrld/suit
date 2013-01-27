@@ -64,6 +64,9 @@ return function(w)
 	elseif keyboard.key == 'end' then
 		w.info.cursor = w.info.text:len()
 	-- info
+	elseif keyboard.key == 'return' then
+		keyboard.clearFocus()
+		keyboard.pressed()
 	elseif keyboard.code >= 32 and keyboard.code < 127 then
 		local left = w.info.text:sub(1,w.info.cursor)
 		local right =  w.info.text:sub(w.info.cursor+1)
