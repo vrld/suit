@@ -5,129 +5,138 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
 
 # Example
 
-    local gui = require "Quickie"
+	local gui = require "Quickie"
 
-    -- lazy font loading
-    local fonts = setmetatable({}, {__index = function(t,k)
-        local f = love.graphics.newFont(k)
-        rawset(t, k, f)
-        return f
-    end })
+	function love.load()
+		-- preload fonts
+		fonts = {
+			[12] = love.graphics.newFont(12),
+			[20] = love.graphics.newFont(20),
+		}
+		love.graphics.setBackgroundColor(17,17,17)
+		love.graphics.setFont(fonts[12])
 
-    function love.load()
-        love.graphics.setBackgroundColor(17,17,17)
-        love.graphics.setFont(fonts[12])
+		-- group defaults
+		gui.group.default.size[1] = 150
+		gui.group.default.size[2] = 25
+		gui.group.default.spacing = 5
+	end
 
-        -- group defaults
-        gui.group.default.size[1] = 150
-        gui.group.default.size[2] = 25
-        gui.group.default.spacing = 5
-    end
+	local menu_open = {
+		main  = false,
+		right = false,
+		foo   = false,
+		demo  = false
+	}
+	local check1   = false
+	local check2   = false
+	local input    = {text = ""}
+	local slider   = {value = .5}
+	local slider2d = {value = {.5,.5}}
 
-    local menu_open = {
-        main  = false,
-        right = false,
-        foo   = false,
-        demo  = false
-    }
-    local check1   = false
-    local check2   = false
-    local input    = {text = ""}
-    local slider   = {value = .5}
-    local slider2d = {value = {.5,.5}}
-    function love.update(dt)
-        gui.group.push{grow = "down", pos = {5,5}}
-        if gui.Checkbox{checked = menu_open.main, text = "Show Menu"} then
-            menu_open.main = not menu_open.main
-        end
+	function love.update(dt)
+		gui.group.push{grow = "down", pos = {5,5}}
 
-        if menu_open.main then
-            gui.group.push{grow = "right"}
-            if gui.Button{text = "Group stacking"} then
-                menu_open.right = not menu_open.right
-            end
+		-- all widgets return true if they are clicked on/activated
+		if gui.Checkbox{checked = menu_open.main, text = "Show Menu"} then
+			menu_open.main = not menu_open.main
+		end
 
-            if menu_open.right then
-                gui.group.push{grow = "up"}
-                if gui.Button{text = "Foo"} then
-                    menu_open.foo = not menu_open.foo
-                end
-                if menu_open.foo then
-                    gui.Button{text = "???"}
-                end
-                gui.group.pop{}
+		if menu_open.main then
+			gui.group.push{grow = "right"}
 
-                gui.Button{text = "Bar"}
-                gui.Button{text = "Baz"}
-            end
-            gui.group.pop{}
+			-- widgets can have custom ID's for tooltips etc (see below)
+			if gui.Button{id = "group stacking", text = "Group stacking"} then
+				menu_open.right = not menu_open.right
+			end
 
-            if gui.Button{text = "Widget demo"} then
-                menu_open.demo = not menu_open.open
-            end
+			if menu_open.right then
+				gui.group.push{grow = "up"}
+				if gui.Button{text = "Foo"} then
+					menu_open.foo = not menu_open.foo
+				end
+				if menu_open.foo then
+					gui.Button{text = "???"}
+				end
+				gui.group.pop{}
 
-        end
-        gui.group.pop{}
+				gui.Button{text = "Bar"}
+				gui.Button{text = "Baz"}
+			end
+			gui.group.pop{}
 
-        if menu_open.demo then
-            gui.group{grow = "down", pos = {200, 80}, function()
+			if gui.Button{text = "Widget demo"} then
+				menu_open.demo = not menu_open.open
+			end
 
-                love.graphics.setFont(fonts[20])
-                gui.Label{text = "Widgets"}
-                love.graphics.setFont(fonts[12])
-                gui.group.push{grow = "right", function()
-                    gui.Button{text = "Button"}
-                    gui.Button{text = "Tight Button", size = {"tight"}}
-                    gui.Button{text = "Tight² Button", size = {"tight", "tight"}}
-                end}
+		end
+		gui.group.pop{}
 
-                gui.group.push{grow = "right", function()
-                    gui.Button{text = "", size = {2}} -- acts as separator
-                    gui.Label{text = "Tight Label", size = {"tight"}}
-                    gui.Button{text = "", size = {2}}
-                    gui.Label{text = "Center Label", align = "center"}
-                    gui.Button{text = "", size = {2}}
-                    gui.Label{text = "Another Label"}
-                    gui.Button{text = "", size = {2}}
-                end}
+		if menu_open.demo then
+			gui.group{grow = "down", pos = {200, 80}, function()
+				love.graphics.setFont(fonts[20])
+				gui.Label{text = "Widgets"}
+				love.graphics.setFont(fonts[12])
+				gui.group{grow = "right", function()
+					gui.Button{text = "Button"}
+					gui.Button{text = "Tight Button", size = {"tight"}}
+					gui.Button{text = "Tight² Button", size = {"tight", "tight"}}
+				end}
 
-                gui.group.push{grow = "right"}
-                if gui.Checkbox{checkbox = check1, text = "Checkbox", size = {"tight"}} then
-                    check1 = not check1
-                if gui.Checkbox{checkbox = check2, text = "Another Checkbox"} then
-                    check2 = not check2
-                end
-                if gui.Checkbox{checkbox = check2, text = "Linked Checkbox"} then
-                    check2 = not check2
-                end
-                gui.group.pop{}
+				gui.group{grow = "right", function()
+					gui.Button{text = "", size = {2}} -- acts as separator
+					gui.Label{text = "Tight Label", size = {"tight"}}
+					gui.Button{text = "", size = {2}}
+					gui.Label{text = "Center Label", align = "center"}
+					gui.Button{text = "", size = {2}}
+					gui.Label{text = "Another Label"}
+					gui.Button{text = "", size = {2}}
+				end}
 
-                gui.group.push{grow = "right", function()
-                    gui.Label{text = "Input", size = {70}}
-                    gui.Input{info = input, size = {300}}
-                end}
+				gui.group.push{grow = "right"}
+				if gui.Checkbox{checked = check1, text = "Checkbox", size = {"tight"}} then
+					check1 = not check1
+					print(check1)
+				end
+				if gui.Checkbox{checked = check2, text = "Another Checkbox"} then
+					check2 = not check2
+				end
+				if gui.Checkbox{checked = check2, text = "Linked Checkbox"} then
+					check2 = not check2
+				end
+				gui.group.pop{}
 
-                gui.group.push{grow = "right", function()
-                    gui.Label{text = "Slider", size = {70}}
-                    gui.Slider{info = slider}
-                    gui.Label{text = ("Value: %.2f"):format(slider.value), size = {70}}
-                end}
+				gui.group{grow = "right", function()
+					gui.Label{text = "Input", size = {70}}
+					gui.Input{info = input, size = {300}}
+				end}
 
-                gui.Label{text = "2D Slider", pos = {nil,10}}
-                gui.Slider2D{info = slider2d, size = {250, 250}}
-                gui.Label{text = ("Value: %.2f, %.2f"):format(slider2d.value[1], slider2d.value[2])}
-            end}
-        end
-    end
+				gui.group{grow = "right", function()
+					gui.Label{text = "Slider", size = {70}}
+					gui.Slider{info = slider}
+					gui.Label{text = ("Value: %.2f"):format(slider.value), size = {70}}
+				end}
 
-    function love.draw()
-        gui.core.draw()
-    end
+				gui.Label{text = "2D Slider", pos = {nil,10}}
+				gui.Slider2D{info = slider2d, size = {250, 250}}
+				gui.Label{text = ("Value: %.2f, %.2f"):format(slider2d.value[1], slider2d.value[2])}
+			end}
+		end
 
-    function love.keypressed(key, code)
-        gui.keyboard.pressed(key, code)
-    end
+		-- tooltip (see above)
+		if gui.mouse.isHot('group stacking') then
+			local mx,my = love.mouse.getPosition()
+			gui.Label{text = 'Demonstrates group stacking', pos = {mx+10,my-20}}
+		end
+	end
 
+	function love.draw()
+		gui.core.draw()
+	end
+
+	function love.keypressed(key, code)
+		gui.keyboard.pressed(key, code)
+	end
 
 # Documentation
 
