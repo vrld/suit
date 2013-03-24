@@ -34,7 +34,11 @@ local cycle = {
 	next = {key = 'tab'},
 }
 
-local function pressed(...) key, code = ... end
+local function pressed(...)
+	key, code = ...
+	assert(type(key) == 'string', 'Invalid argument `key`. Expected string, got ' .. type(key))
+	assert(type(code) == 'number', 'Invalid argument `code`. Expected number, got ' .. type(code))
+end
 local function setFocus(id) focus = id end
 local function disable()    focus = NO_WIDGET end
 local function clearFocus() focus = nil end
