@@ -77,17 +77,17 @@ return function(w)
 
 	if keyboard.hasFocus(id) then
 		if keyboard.key == 'down' then
-			w.info.value[2] = math.min(w.info.max[2], w.info.value[2] + w.info.step.y)
+			w.info.value[2] = math.min(w.info.max[2], w.info.value[2] + w.info.step[2])
 			changed = true
 		elseif keyboard.key == 'up' then
-			w.info.value[2] = math.max(w.info.min[2], w.info.value[2] - w.info.step.y)
+			w.info.value[2] = math.max(w.info.min[2], w.info.value[2] - w.info.step[2])
 			changed = true
 		end
 		if keyboard.key == 'right' then
-			w.info.value[1] = math.min(w.info.max[1], w.info.value[1] + w.info.step.x)
+			w.info.value[1] = math.min(w.info.max[1], w.info.value[1] + w.info.step[1])
 			changed = true
 		elseif keyboard.key == 'left' then
-			w.info.value[1] = math.max(w.info.min[1], w.info.value[1] - w.info.step.x)
+			w.info.value[1] = math.max(w.info.min[1], w.info.value[1] - w.info.step[1])
 			changed = true
 		end
 	end
