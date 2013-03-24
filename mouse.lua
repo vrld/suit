@@ -73,9 +73,9 @@ local function endFrame()
 end
 
 local function disable()
-	_M.beginFrame   = _NOP__
-	_M.endFrame     = _NOP__
-	_M.updateWidget = _NOP__
+	_M.beginFrame   = _NOP_
+	_M.endFrame     = _NOP_
+	_M.updateWidget = _NOP_
 end
 
 local function enable()
