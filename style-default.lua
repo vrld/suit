@@ -82,20 +82,24 @@ end
 local function Slider(state, fraction, vertical, x,y,w,h)
 	local c = color[state]
 	
-	love.graphics.setLineWidth(2)
+	love.graphics.setLine(2, 'rough')
 	love.graphics.setColor(c.border)
-	love.graphics.line(x,y+h/2-1,x+w,y+h/2-1)
-	love.graphics.line(x,y+h/2+1,x+w,y+h/2+1)
-	love.graphics.setColor(c.bg)
-	love.graphics.line(x,y+h/2,x+w,y+h/2)
-
 	if vertical then
-		y = math.floor(y + h * fraction - 5)
+		love.graphics.line(x+w/2-1,y,x+w/2-1,y+h)
+		love.graphics.line(x+w/2+1,y,x+w/2+1,y+h)
+		love.graphics.setColor(c.bg)
+		love.graphics.line(x+w/2,y,x+w/2,y+h)
+		y = math.floor(y + h - h * fraction - 5)
 		h = 10
 	else
+		love.graphics.line(x,y+h/2-1,x+w,y+h/2-1)
+		love.graphics.line(x,y+h/2+1,x+w,y+h/2+1)
+		love.graphics.setColor(c.bg)
+		love.graphics.line(x,y+h/2,x+w,y+h/2)
 		x = math.floor(x + w * fraction - 5)
 		w = 10
 	end
+
 	box(x,y,w,h, c.bg,c.border)
 end
 

@@ -39,7 +39,7 @@ return function(w)
 	local fraction = (w.info.value - w.info.min) / (w.info.max - w.info.min)
 
 	local id = w.id or core.generateID()
-	local pos, size = group.getRect(w.pos, w.info.size)
+	local pos, size = group.getRect(w.pos, w.size)
 
 	mouse.updateWidget(id, pos, size, w.widgetHit)
 	keyboard.makeCyclable(id)
