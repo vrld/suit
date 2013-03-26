@@ -129,8 +129,10 @@ local function Input(state, text, cursor, x,y,w,h)
 	love.graphics.setLine(1, 'rough')
 	love.graphics.setColor(color.normal.fg)
 	love.graphics.print(text, x+2,y+(h-th)/2)
-	love.graphics.setColor(color.active.fg)
-	love.graphics.line(cursorPos, y+4, cursorPos, y+h-4)
+	if state ~= 'normal' then
+		love.graphics.setColor(color.active.fg)
+		love.graphics.line(cursorPos, y+4, cursorPos, y+h-4)
+	end
 end
 
 local function Checkbox(state, checked, label, align, x,y,w,h)
