@@ -125,14 +125,17 @@ local function Input(state, text, cursor, x,y,w,h)
 	local f = love.graphics.getFont()
 	local th = f:getHeight(text)
 	local cursorPos = x + 2 + f:getWidth(text:sub(1,cursor))
+	local offset = 2 - math.floor((cursorPos-x) / (w-4)) * (w-4)
 
+	love.graphics.setScissor(x+1,y,w-2,h)
 	love.graphics.setLine(1, 'rough')
 	love.graphics.setColor(color.normal.fg)
-	love.graphics.print(text, x+2,y+(h-th)/2)
+	love.graphics.print(text, x+offset,y+(h-th)/2)
 	if state ~= 'normal' then
 		love.graphics.setColor(color.active.fg)
-		love.graphics.line(cursorPos, y+4, cursorPos, y+h-4)
+		love.graphics.line(cursorPos+offset, y+4, cursorPos+offset, y+h-4)
 	end
+	love.graphics.setScissor()
 end
 
 local function Checkbox(state, checked, label, align, x,y,w,h)
