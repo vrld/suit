@@ -48,20 +48,6 @@ local function strictOr(...)
 	return ret
 end
 
--- allow packed nil
-local function save_pack(...)
-	return {n = select('#', ...), ...}
-end
-
-local function save_unpack_helper(t, i, ...)
-	if i <= 0 then return ... end
-	return save_unpack_helper(t, i-1, t[i], ...)
-end
-
-local function save_unpack(t)
-	return save_unpack_helper(t, t.n)
-end
-
 --
 -- Widget ID
 --
@@ -90,11 +76,11 @@ local function registerDraw(id, f, ...)
 	if mouse.isHot(id) or keyboard.hasFocus(id) then
 		state = mouse.isActive(id) and 'active' or 'hot'
 	end
-	local rest = save_pack(...)
+	local rest = {n = select('#', ...), ...}
 	draw_items.n = draw_items.n + 1
 	draw_items[draw_items.n] = function()
 		if font then love.graphics.setFont(font) end
-		f(state, save_unpack(rest))
+		f(state, unpack(rest, 1, rest.n))
 	end
 end
 
@@ -137,6 +123,4 @@ return {
 
 	strictAnd    = strictAnd,
 	strictOr     = strictOr,
-	save_pack    = save_pack,
-	save_unpack  = save_unpack,
 }
