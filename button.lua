@@ -72,6 +72,6 @@ return function(w)
 	core.registerDraw(id, w.draw or core.style.Button,
 		w.text, pos[1],pos[2], size[1],size[2])
 
-	return mouse.releasedOn(id) or (keyboard.key == 'return' and keyboard.hasFocus(id))
+	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')
 end
 

@@ -27,7 +27,7 @@ THE SOFTWARE.
 local _M -- holds the module. needed to make widgetHit overridable
 
 local x,y = 0,0
-local down = false
+local down, downLast = false, false
 local hot, active = nil, nil
 local NO_WIDGET = {}
 local function _NOP_() end
@@ -55,13 +55,17 @@ local function updateWidget(id, pos, size, hit)
 end
 
 local function releasedOn(id)
-	return not down and isHot(id) and isActive(id)
+	return not down and isHot(id) and isActive(id) and downLast
 end
 
 local function beginFrame()
 	hot = nil
 	x,y = love.mouse.getPosition()
-	down = love.mouse.isDown('l')
+	downLast = down
+	down = false
+	for _,btn in ipairs{'l', 'm', 'r'} do
+		down = down or (love.mouse.isDown(btn) and btn)
+	end
 end
 
 local function endFrame()

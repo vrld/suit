@@ -70,6 +70,10 @@ local function makeCyclable(id)
 	lastwidget = id
 end
 
+local function pressedOn(id, k)
+	return (k or 'return') == key and hasFocus(id) and k
+end
+
 local function beginFrame()
 	-- for future use?
 end
@@ -88,6 +92,7 @@ return setmetatable({
 	clearFocus    = clearFocus,
 	hasFocus      = hasFocus,
 	makeCyclable  = makeCyclable,
+	pressedOn     = pressedOn,
 
 	disable       = disable,
 	enable        = clearFocus,
