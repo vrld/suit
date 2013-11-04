@@ -127,7 +127,18 @@ local function Input(state, text, cursor, x,y,w,h)
 	local cursorPos = x + 2 + f:getWidth(text:sub(1,cursor))
 	local offset = 2 - math.floor((cursorPos-x) / (w-4)) * (w-4)
 
-	love.graphics.setScissor(x+1,y,w-2,h)
+	local tsx,tsy,tsw,tsh = x+1, y, w-2, h
+	local sx,sy,sw,sh = love.graphics.getScissor()
+	if sx then -- intersect current scissors with our's
+		local l,r = math.max(sx, tsx), math.min(sx+sw, tsx+tsw)
+		local t,b = math.max(sy, tsy), math.min(sy+sh, tsy+tsh)
+		if l > r or t > b then -- there is no intersection
+			return
+		end
+		tsx, tsy, tsw, tsh = l, t, r-l, b-t
+	end
+
+	love.graphics.setScissor(tsx, tsy, tsw, tsh)
 	love.graphics.setLine(1, 'rough')
 	love.graphics.setColor(color.normal.fg)
 	love.graphics.print(text, x+offset,y+(h-th)/2)
@@ -135,7 +146,11 @@ local function Input(state, text, cursor, x,y,w,h)
 		love.graphics.setColor(color.active.fg)
 		love.graphics.line(cursorPos+offset, y+4, cursorPos+offset, y+h-4)
 	end
-	love.graphics.setScissor()
+	if sx then
+		love.graphics.setScissor(sx,sy,sw,sh)
+	else
+		love.graphics.setScissor()
+	end
 end
 
 local function Checkbox(state, checked, label, align, x,y,w,h)
