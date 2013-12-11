@@ -99,7 +99,8 @@ local function draw()
 	for i = 1,draw_items.n do draw_items[i]() end
 
 	-- restore graphics state
-	love.graphics.setLine(lw, ls)
+	love.graphics.setLineWidth(lw)
+	love.graphics.setLineStyle(ls)
 	if f then love.graphics.setFont(f) end
 	love.graphics.setColor(c)
 

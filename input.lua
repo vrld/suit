@@ -29,6 +29,7 @@ local core     = require(BASE .. 'core')
 local group    = require(BASE .. 'group')
 local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
+local utf8     = require(BASE .. 'utf8')
 
 -- {info = {text = "", cursor = text:len()}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
 return function(w)
@@ -45,11 +46,13 @@ return function(w)
 	if not keyboard.hasFocus(id) then
 		--[[nothing]]
 	-- editing
-	elseif keyboard.key == 'backspace' then
-		w.info.text = w.info.text:sub(1,w.info.cursor-1) .. w.info.text:sub(w.info.cursor+1)
+	elseif keyboard.key == 'backspace' and w.info.cursor > 0 then
 		w.info.cursor = math.max(0, w.info.cursor-1)
+		local left, right = utf8.split(w.info.text, w.info.cursor)
+		w.info.text = left .. utf8.sub(right, 2)
 	elseif keyboard.key == 'delete' then
-		w.info.text = w.info.text:sub(1,w.info.cursor) .. w.info.text:sub(w.info.cursor+2)
+		local left, right = utf8.split(w.info.text, w.info.cursor)
+		w.info.text = left .. utf8.sub(right, 2)
 		w.info.cursor = math.min(w.info.text:len(), w.info.cursor)
 	-- movement
 	elseif keyboard.key == 'left' then
@@ -64,10 +67,9 @@ return function(w)
 	elseif keyboard.key == 'return' then
 		keyboard.clearFocus()
 		keyboard.pressed('', -1)
-	elseif keyboard.code >= 32 and keyboard.code < 127 then
-		local left = w.info.text:sub(1,w.info.cursor)
-		local right =  w.info.text:sub(w.info.cursor+1)
-		w.info.text = table.concat{left, string.char(keyboard.code), right}
+	elseif keyboard.str then
+		local left, right = utf8.split(w.info.text, w.info.cursor)
+		w.info.text = left .. keyboard.str .. right
 		w.info.cursor = w.info.cursor + 1
 	end
 

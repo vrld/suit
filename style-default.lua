@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
+local BASE = (...):match("(.-)[^%.]+$")
+local utf8 = require(BASE .. 'utf8')
+
 -- default style
 local color = {
 	normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
@@ -43,7 +46,8 @@ end
 gradient:set(200,255)
 
 local function box(x,y,w,h, bg, border, flip)
-	love.graphics.setLine(1, 'rough')
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle('rough')
 
 	love.graphics.setColor(bg)
 	local sy = flip and -h/2 or h/2
@@ -82,7 +86,8 @@ end
 local function Slider(state, fraction, vertical, x,y,w,h)
 	local c = color[state]
 	
-	love.graphics.setLine(1, 'rough')
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle('rough')
 	love.graphics.setColor(c.bg)
 	if vertical then
 		love.graphics.rectangle('fill', x+w/2-2,y,4,h)
@@ -105,7 +110,8 @@ local function Slider2D(state, fraction, x,y,w,h)
 	box(x,y,w,h, c.bg, c.border)
 
 	-- draw quadrants
-	love.graphics.setLine(1, 'rough')
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle('rough')
 	love.graphics.setColor(c.fg[1], c.fg[2], c.fg[3], math.min(127,c.fg[4] or 255))
 	love.graphics.line(x+w/2,y, x+w/2,y+h)
 	love.graphics.line(x,y+h/2, x+w,y+h/2)
@@ -124,7 +130,7 @@ local function Input(state, text, cursor, x,y,w,h)
 
 	local f = love.graphics.getFont()
 	local th = f:getHeight(text)
-	local cursorPos = x + 2 + f:getWidth(text:sub(1,cursor))
+	local cursorPos = x + 2 + f:getWidth(utf8.sub(text, 1,cursor))
 	local offset = 2 - math.floor((cursorPos-x) / (w-4)) * (w-4)
 
 	local tsx,tsy,tsw,tsh = x+1, y, w-2, h
@@ -139,7 +145,8 @@ local function Input(state, text, cursor, x,y,w,h)
 	end
 
 	love.graphics.setScissor(tsx, tsy, tsw, tsh)
-	love.graphics.setLine(1, 'rough')
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle('rough')
 	love.graphics.setColor(color.normal.fg)
 	love.graphics.print(text, x+offset,y+(h-th)/2)
 	if state ~= 'normal' then

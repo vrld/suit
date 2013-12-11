@@ -135,7 +135,16 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
 	end
 
 	function love.keypressed(key, code)
-		gui.keyboard.pressed(key, code)
+		gui.keyboard.pressed(key)
+		-- LÖVE 0.8: see if this code can be converted in a character
+		if pcall(string.char, code) code > 0 then
+			gui.keyboard.textinput(string.char(code))
+		end
+	end
+
+	-- LÖVE 0.9
+	function love.textinput(str)
+		gui.keyboard.textinput(str)
 	end
 
 # Documentation

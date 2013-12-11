@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local key,code = nil, -1
+local key,str = nil, nil
 local focus, lastwidget
 local NO_WIDGET = {}
 
@@ -34,11 +34,16 @@ local cycle = {
 	next = {key = 'tab'},
 }
 
-local function pressed(...)
-	key, code = ...
-	assert(type(key) == 'string', 'Invalid argument `key`. Expected string, got ' .. type(key))
-	assert(type(code) == 'number', 'Invalid argument `code`. Expected number, got ' .. type(code))
+local function pressed(k)
+	assert(type(k) == 'string', 'Invalid argument `key`. Expected string, got ' .. type(k))
+	key = k
 end
+
+local function textinput(s)
+	assert(type(s) == 'string', 'Invalid argument `key`. Expected string, got ' .. type(s))
+	str = s
+end
+
 local function setFocus(id) focus = id end
 local function disable()    focus = NO_WIDGET end
 local function clearFocus() focus = nil end
@@ -79,12 +84,13 @@ local function beginFrame()
 end
 
 local function endFrame()
-	key, code = nil, -1
+	key, str = nil, nil
 end
 
 return setmetatable({
 	cycle         = cycle,
 	pressed       = pressed,
+	textinput     = textinput,
 	tryGrab       = tryGrab,
 	isBindingDown = isBindingDown,
 	setFocus      = setFocus,
@@ -99,4 +105,4 @@ return setmetatable({
 
 	beginFrame   = beginFrame,
 	endFrame     = endFrame,
-}, {__index = function(_,k) return ({key = key, code = code})[k] end})
+}, {__index = function(_,k) return ({key = key, str = str})[k] end})
