@@ -1,3 +1,26 @@
+-- utf8.lua - Basic (and unsafe) utf8 string support in plain Lua - public domain
+--
+-- Written in 2013 by Matthias Richter (vrld@vrld.org)
+--
+-- This software is in the public domain. Where that dedication is not
+-- recognized, you are granted a perpetual, irrevokable license to copy and
+-- modify this file as you see fit. This software is distributed without any
+-- warranty.
+
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--  ALL FUNCTIONS ARE UNSAFE: THEY ASSUME VALID UTF8 INPUT
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+-- Generic for iterator.
+--
+-- Arguments:
+--     s ... The utf8 string.
+--     i ... Last byte of the previous codepoint.
+--
+-- Returns:
+--     k ... Number of the *last* byte of the codepoint.
+--     c ... The utf8 codepoint (character).
+--     n ... Width/number of bytes of the codepoint.
 local function iter(s, i)
 	if i >= #s then return end
 	local b, nbytes = s:byte(i+1,i+1), 1
@@ -14,16 +37,40 @@ local function iter(s, i)
 	return i+nbytes, s:sub(i+1,i+nbytes), nbytes
 end
 
+-- Shortcut to the generic for iterator.
+--
+-- Usage:
+--    for k, c, n in chars(s) do
+--        ...
+--    end
+--
+--    Meaning of k, c, and n is the same as in iter(s, i).
 local function chars(s)
 	return iter, s, 0
 end
 
+-- Get length in characters of an utf8 string.
+--
+-- Arguments:
+--     s ... The utf8 string.
+--
+-- Returns:
+--     n ... Number of utf8 characters in s.
 local function len(s)
 	-- assumes sane utf8 string: count the number of bytes that is *not* 10xxxxxx
 	local _, c = s:gsub('[^\128-\191]', '')
 	return c
 end
 
+-- Get substring, same semantics as string.sub(s,i,j).
+--
+-- Arguments:
+--     s ... The utf8 string.
+--     i ... Starting position, may be negative.
+--     j ... (optional) Ending position, may be negative.
+--
+-- Returns:
+--     t ... The substring.
 local function sub(s, i, j)
 	local l = len(s)
 	j = j or l
@@ -40,6 +87,15 @@ local function sub(s, i, j)
 	return table.concat(t)
 end
 
+-- Split utf8 string in two substrings
+--
+-- Arguments:
+--     s ... The utf8 string.
+--     i ... The position to split, may be negative.
+--
+-- Returns:
+--     left  ... Substring before i.
+--     right ... Substring after i.
 local function split(s, i)
 	local l = len(s)
 	if i < 0 then i = l + i + 1 end
@@ -52,6 +108,13 @@ local function split(s, i)
 	return s:sub(1, pos), s:sub(pos+1, -1)
 end
 
+-- Reverses order of characters in an utf8 string.
+--
+-- Arguments:
+--     s ... The utf8 string.
+--
+-- Returns:
+--     t ... The revered string.
 local function reverse(s)
 	local t = {}
 	for _, c in chars(s) do
