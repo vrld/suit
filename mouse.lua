@@ -60,7 +60,7 @@ end
 
 local function beginFrame()
 	hot = nil
-	x,y = love.mouse.getPosition()
+	x,y = _M.getMousePosition()
 	downLast = down
 	down = false
 	for _,btn in ipairs{'l', 'm', 'r'} do
@@ -103,6 +103,7 @@ _M = {
 
 	disable      = disable,
 	enable       = enable,
+        getMousePosition = love.mouse.getPosition
 }
 
 -- metatable provides getters to x, y and down
