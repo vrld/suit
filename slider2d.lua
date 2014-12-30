@@ -31,7 +31,7 @@ local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
 
 -- {info = {value = {x,y}, min = {0,0}, max = {1,1}, step = (max-min)/20}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
+local function slider2d(w)
 	assert(type(w) == 'table' and type(w.info) == "table" and w.info.value, "Invalid argument.")
 	w.info.min = {
 		w.info.min and w.info.min[1] or 0,
@@ -97,3 +97,4 @@ return function(w)
 
 	return changed
 end
+return slider2d

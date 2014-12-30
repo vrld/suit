@@ -32,7 +32,7 @@ local keyboard = require(BASE .. 'keyboard')
 local utf8     = require(BASE .. 'utf8')
 
 -- {info = {text = "", cursor = text:len()}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
+local function input(w)
 	assert(type(w) == "table" and type(w.info) == "table", "Invalid argument")
 	w.info.text = w.info.text or ""
 	w.info.cursor = math.min(w.info.cursor or w.info.text:len(), w.info.text:len())
@@ -78,3 +78,4 @@ return function(w)
 
 	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')
 end
+return input

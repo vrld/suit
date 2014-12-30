@@ -31,7 +31,7 @@ local keyboard = require(BASE .. 'keyboard')
 
 -- the widget
 -- {text = text, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
+local function button(w)
 	assert(type(w) == "table" and w.text, "Invalid argument")
 
 	-- if tight fit requested, compute the size according to text size
@@ -74,4 +74,4 @@ return function(w)
 
 	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')
 end
-
+return button

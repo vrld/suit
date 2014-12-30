@@ -30,7 +30,7 @@ local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
 
 -- {checked = status, text = "", algin = "left", pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
+local function checkbox(w)
 	assert(type(w) == "table")
 	w.text = w.text or ""
 
@@ -65,4 +65,4 @@ return function(w)
 
 	return w.checked ~= checked
 end
-
+return checkbox

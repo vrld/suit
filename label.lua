@@ -31,7 +31,7 @@ local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
 
 -- {text = text, align = align,  pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
+local function label(w)
 	assert(type(w) == "table" and w.text, "Invalid argument")
 	w.align = w.align or 'left'
 
@@ -58,4 +58,4 @@ return function(w)
 
 	return mouse.releasedOn(id)
 end
-
+return label
