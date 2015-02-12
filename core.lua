@@ -78,10 +78,14 @@ local function registerDraw(id, f, ...)
 	end
 	local rest = {n = select('#', ...), ...}
 	draw_items.n = draw_items.n + 1
-	draw_items[draw_items.n] = function()
+	
+	local targetindex = draw_items.n
+	if id == "group_draw" then targetindex = 1 end
+	
+	table.insert(draw_items, targetindex, function()
 		if font then love.graphics.setFont(font) end
 		f(state, unpack(rest, 1, rest.n))
-	end
+	end)
 end
 
 -- actually update-and-draw

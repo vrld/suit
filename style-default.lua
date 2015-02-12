@@ -31,7 +31,8 @@ local utf8 = require(BASE .. 'utf8')
 local color = {
 	normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
 	hot    = {bg = {98,98,98}, fg = {69,201,84},   border={30,30,30}},
-	active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
+	active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}},
+	group = {bg = {88,88,88}, border = {255,255,255}}
 }
 
 -- box drawing
@@ -189,6 +190,16 @@ local function Checkbox(state, checked, label, align, x,y,w,h)
 	love.graphics.print(label, tx, ty)
 end
 
+local function Group(state, bkg, border, x,y,w,h)
+	if bkg then
+		love.graphics.setColor(color.group.bg)
+		love.graphics.rectangle("fill", x, y, w, h)
+	end
+	if border then
+		love.graphics.setColor(color.group.border)
+		love.graphics.rectangle("line", x, y, w, h)
+	end
+end
 
 -- the style
 return {
@@ -201,4 +212,5 @@ return {
 	Slider2D = Slider2D,
 	Input    = Input,
 	Checkbox = Checkbox,
+	Group    = Group,
 }
