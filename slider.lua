@@ -72,7 +72,7 @@ return function(w)
 		end
 	end
 
-	core.registerDraw(id, w.draw or core.style.Slider,
+	core.registerDraw(id, w.draw or core.style.Slider, false,
 		fraction, w.vertical, pos[1],pos[2], size[1],size[2])
 
 	return changed

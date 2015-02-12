@@ -60,7 +60,7 @@ return function(w)
 		w.checked = not w.checked
 	end
 
-	core.registerDraw(id, w.draw or core.style.Checkbox,
+	core.registerDraw(id, w.draw or core.style.Checkbox, false,
 		w.checked, w.text, w.align or 'left', pos[1], pos[2], size[1], size[2])
 
 	return w.checked ~= checked
