@@ -53,7 +53,7 @@ return function(w)
 		keyboard.clearFocus()
 	end
 
-	core.registerDraw(id, w.draw or core.style.Label, false,
+	core.registerDraw(id, w.draw or core.style.Label,
 		w.text, w.align, pos[1],pos[2], size[1],size[2])
 
 	return mouse.releasedOn(id)

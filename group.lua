@@ -79,10 +79,7 @@ local function push(info)
 	assert(size, "Size neither specified nor derivable from parent group.")
 	assert(pos, "Position neither specified nor derivable from parent group.")
 	grow = assert(Grow[grow], "Invalid grow: " .. tostring(grow))
-    
-	local id = info.id
-	if not id then id = core.generateID() end
-    
+	
 	current = {
 		pos         = pos,
 		grow        = grow,
@@ -92,7 +89,6 @@ local function push(info)
 		border      = info.border,
 		bkg         = info.bkg,
 		draw        = info.draw,
-        id          = id,
 		upper_left  = { math.huge,  math.huge},
 		lower_right = {-math.huge, -math.huge},
 	}
@@ -154,8 +150,9 @@ local function pop()
 	}
 	advance(current.pos, size)
     
+	-- skip the draw call if we don't need it
 	if child.bkg or child.border then
-		core.registerDraw(child.id, child.draw or core.style.Group, true,
+		core.registerDraw("group_draw", child.draw or core.style.Group,
 		child.bkg, child.border, child.upper_left[1], child.upper_left[2], child.lower_right[1] - child.upper_left[1], child.lower_right[2] - child.upper_left[2])
 	end
 end

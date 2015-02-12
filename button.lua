@@ -69,7 +69,7 @@ return function(w)
 
 	-- core.registerDraw(id, drawfunction, drawfunction-arguments...)
 	-- shows widget when core.draw() is called.
-	core.registerDraw(id, w.draw or core.style.Button, false,
+	core.registerDraw(id, w.draw or core.style.Button,
 		w.text, pos[1],pos[2], size[1],size[2])
 
 	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')

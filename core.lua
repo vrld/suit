@@ -66,7 +66,7 @@ end
 -- Drawing / Frame update
 --
 local draw_items = {n = 0}
-local function registerDraw(id, f, isGroup, ...)
+local function registerDraw(id, f, ...)
 	assert(type(f) == 'function' or (getmetatable(f) or {}).__call,
 	       'Drawing function is not a callable type!')
 
@@ -80,7 +80,7 @@ local function registerDraw(id, f, isGroup, ...)
 	draw_items.n = draw_items.n + 1
     
     local targetindex = draw_items.n
-    if isGroup then targetindex = 1 end
+    if id == "group_draw" then targetindex = 1 end
     
 	table.insert(draw_items, targetindex, function()
 		if font then love.graphics.setFont(font) end
