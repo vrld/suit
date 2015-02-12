@@ -47,14 +47,15 @@ local Grow = {
 	right = { 1,  0}
 }
 
--- {grow = grow, spacing = spacing, size = size, pos = pos, draw = draw, border = bool, bkg = bool, padding = padding}
+-- {grow = grow, spacing = spacing, size = size, pos = pos, draw = draw, 
+--  border = bool, bkg = bool, padding = padding}
 local function push(info)
-    
-    if not core then core = require(BASE .. 'core') end
-    
+	
+	if not core then core = require(BASE .. 'core') end
+	
 	local grow    = info.grow    or "none"
 	local spacing = info.spacing or default.spacing
-    local pad = info.pad or default.pad
+	local pad = info.pad or default.pad
 
 	local size = {
 		info.size and info.size[1] or current.size[1],
@@ -62,35 +63,35 @@ local function push(info)
 	}
 
 	local pos = {current.pos[1], current.pos[2]}
-    
-    -- apply parent container padding (if any)
-    local parent = stack[stack.n]
-    if parent then 
-        pos[1] = pos[1] + parent.pad
-        pos[2] = pos[2] + parent.pad
-    end
+	
+	-- apply parent container padding (if any)
+	local parent = stack[stack.n]
+	if parent then 
+		pos[1] = pos[1] + parent.pad
+		pos[2] = pos[2] + parent.pad
+	end
     
 	if info.pos then
 		pos[1] = pos[1] + (info.pos[1] or 0)
 		pos[2] = pos[2] + (info.pos[2] or 0)
 	end
-
+	
 	assert(size, "Size neither specified nor derivable from parent group.")
 	assert(pos, "Position neither specified nor derivable from parent group.")
 	grow = assert(Grow[grow], "Invalid grow: " .. tostring(grow))
     
-    local id = info.id
-    if not id then id = core.generateID() end
+	local id = info.id
+	if not id then id = core.generateID() end
     
 	current = {
 		pos         = pos,
 		grow        = grow,
 		size        = size,
 		spacing     = spacing,
-        pad         = pad,
-        border      = info.border,
-        bkg         = info.bkg,
-        draw        = info.draw,
+		pad         = pad,
+		border      = info.border,
+		bkg         = info.bkg,
+		draw        = info.draw,
         id          = id,
 		upper_left  = { math.huge,  math.huge},
 		lower_right = {-math.huge, -math.huge},
@@ -111,11 +112,7 @@ local function advance(pos, size)
 	if current.grow[2] ~= 0 then
 		current.pos[2] = pos[2] + current.grow[2] * (size[2] + current.spacing)
 	end
-    
-    -- adjust for padding
-    --pos[1] = pos[1] + current.pad
-    --pos[2] = pos[2] + current.pad
-    
+	
 	return pos, size
 end
 
@@ -130,26 +127,26 @@ local function getRect(pos, size)
 	if current.grow[2] < 0 and current.size[2] ~= size[2] then
 		current.pos[2] = current.pos[2] - (current.size[2] - size[2])
 	end
-
+	
 	pos[1] = pos[1] + current.pos[1]
 	pos[2] = pos[2] + current.pos[2]
-    
-    local pos, size = advance(pos, size)
-    pos[1] = pos[1] + current.pad
-    pos[2] = pos[2] + current.pad
+	
+	pos, size = advance(pos, size)
+	pos[1] = pos[1] + current.pad
+	pos[2] = pos[2] + current.pad
 	return pos, size
 end
 
 local function pop()
 	assert(stack.n > 0, "Group stack is empty.")
-    
+	
 	stack.n = stack.n - 1
 	local child = current
 	current = stack[stack.n] or default
-    
-    -- adjust for padding
-    child.lower_right[1] = child.lower_right[1] + child.pad * 2
-    child.lower_right[2] = child.lower_right[2] + child.pad * 2
+	
+	-- adjust for padding
+	child.lower_right[1] = child.lower_right[1] + child.pad * 2
+	child.lower_right[2] = child.lower_right[2] + child.pad * 2
 
 	local size = {
 		child.lower_right[1] - math.max(child.upper_left[1], current.pos[1]),
@@ -157,10 +154,10 @@ local function pop()
 	}
 	advance(current.pos, size)
     
-    if child.bkg or child.border then
-        core.registerDraw(child.id, child.draw or core.style.Group, true,
+	if child.bkg or child.border then
+		core.registerDraw(child.id, child.draw or core.style.Group, true,
 		child.bkg, child.border, child.upper_left[1], child.upper_left[2], child.lower_right[1] - child.upper_left[1], child.lower_right[2] - child.upper_left[2])
-    end
+	end
 end
 
 local function beginFrame()
