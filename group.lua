@@ -35,7 +35,7 @@ local default = {
 	size = {100, 30},
 	upper_left  = {0,0},
 	lower_right = {0,0},
-    pad = 0
+	pad = 0
 }
 local current = default
 
