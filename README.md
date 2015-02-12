@@ -73,7 +73,7 @@ Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial
 		gui.group.pop{}
 
 		if menu_open.demo then
-			gui.group{grow = "down", pos = {200, 80}, function()
+			gui.group{grow = "down", pos = {200, 80}, pad = 10, border = true, bkg = true, function()
 				love.graphics.setFont(fonts[20])
 				gui.Label{text = "Widgets"}
 				love.graphics.setFont(fonts[12])
