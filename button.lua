@@ -30,7 +30,7 @@ local mouse    = require(BASE .. 'mouse')
 local keyboard = require(BASE .. 'keyboard')
 
 -- the widget
--- {text = text, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
+-- {text = text, hotkey="key", pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
 return function(w)
 	assert(type(w) == "table" and w.text, "Invalid argument")
 
@@ -72,6 +72,6 @@ return function(w)
 	core.registerDraw(id, w.draw or core.style.Button,
 		w.text, pos[1],pos[2], size[1],size[2])
 
-	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')
+	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return') or keyboard.pressedHotkey(w.hotkey)
 end
 
