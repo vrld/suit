@@ -79,6 +79,10 @@ local function pressedOn(id, k)
 	return (k or 'return') == key and hasFocus(id) and k
 end
 
+local function pressedHotkey(hotkey)
+	return hotkey and ( key == hotkey )
+end
+
 local function beginFrame()
 	-- for future use?
 end
@@ -99,6 +103,7 @@ return setmetatable({
 	hasFocus      = hasFocus,
 	makeCyclable  = makeCyclable,
 	pressedOn     = pressedOn,
+	pressedHotkey = pressedHotkey,
 
 	disable       = disable,
 	enable        = clearFocus,
