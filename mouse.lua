@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
+local love = require("love")
+
 local _M -- holds the module. needed to make widgetHit overridable
 
 local x,y = 0,0

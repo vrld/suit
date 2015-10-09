@@ -24,8 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local BASE = (...) .. '.'
-assert(not BASE:match('%.init%.$'), "Invalid require path `"..(...).."' (drop the `.init').")
+local BASE = (... or ''):gsub('%.init$', '')
+
+assert(not BASE:match('%.init$'), "Invalid require path `"..(... or '').."' (drop the `.init').")
+BASE = BASE.."."
 
 return {
 	core     = require(BASE .. 'core'),
