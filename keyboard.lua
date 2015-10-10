@@ -30,8 +30,16 @@ local NO_WIDGET = {}
 
 local cycle = {
 	-- binding = {key = key, modifier1, modifier2, ...} XXX: modifiers are OR-ed!
-	prev = {key = 'tab', 'lshift', 'rshift'},
-	next = {key = 'tab'},
+	prev = {
+		{ key = 'up'},
+		{ key = 'left'},
+		{ key = 'tab', 'lshift', 'rshift'},
+	},
+	next = {
+		{ key = 'down'},
+		{ key = 'right'},
+		{ key = 'tab'},
+	}
 }
 
 local function pressed(k)
@@ -57,8 +65,12 @@ local function tryGrab(id)
 end
 
 local function isBindingDown(bind)
-	local modifiersDown = #bind == 0 or love.keyboard.isDown(unpack(bind))
-	return key == bind.key and modifiersDown
+	for i,b in pairs (bind) do
+		local modifiersDown = #b == 0 or love.keyboard.isDown(unpack(b))
+		if key == b.key and modifiersDown then
+			return true
+		end
+	end
 end
 
 local function makeCyclable(id)
