@@ -1,184 +1,177 @@
-# QUICKIE
+# SUIT
 
-Quickie is an [immediate mode gui][IMGUI] library for [L&Ouml;VE][LOVE]. Initial inspiration came from the article [Sol on Immediate Mode GUIs (IMGUI)][Sol]. You should check it out to understand how Quickie works.
+Simple User Interface Toolkit for LÖVE.
+
+## Immediate mode GUI
+
+SUIT is an immediate mode GUI library.
+
+With classical (retained) mode libraries you typically have a stage where you
+create the whole UI when the program initializes. After that point, the GUI
+does not change much.
+
+With immediate mode libraries, on the other hand, the GUI is created every
+frame from scratch. There are no widget objects, only functions that draw the
+widget and update internal GUI state. This allows to put the widgets in their
+immediate conceptual context (instead of a construction stage). It also makes
+the UI very flexible: Don't want to draw a widget? Simply remove the call.
+Handling the mutable data (e.g., text of an input box) of each widget is your
+responsibility. This separation of behaviour and data 
+
+## What SUIT is
+
+SUIT is simple: It provides only the most important widgets for games:
+
+- Buttons (including Image Buttons)
+- Checkboxes
+- Text Input
+- Value Sliders
+
+SUIT is comfortable: It features a simple, yet effective row/column-based
+layouting engine.
+
+SUIT is adaptable: You can easily alter the color scheme, change how widgets
+are drawn or swap the whole theme.
+
+SUIT is hackable: The core library can be used to construct new widgets with
+relative ease.
+
+**SUIT is good at games**
+
+## What SUIT is not
+
+SUIT is not a complete GUI library: It does not provide dropdowns, subwindows,
+radio buttons, menu bars, ribbons, etc.
+
+SUIT is not a complete GUI library: SUIT spits MVC and other good OO practices
+in the face.
+
+SUIT is not a complete GUI library: There is no markup language to generate or
+style the GUI.
+
+**SUIT is not good at "serious" applications**
+
+## Example code
+
+## Documentation
+
+To be done.
+
+## Example code
 
 
-# Example
+```lua
+suit = require 'suit'
 
-	local gui = require "Quickie"
+function love.load()
+	-- generate some assets
+	snd = generateClickySound()
+	normal, hot = generateImageButton()
+	smallerFont = love.graphics.newFont(10)
+end
 
-	function love.load()
-		-- preload fonts
-		fonts = {
-			[12] = love.graphics.newFont(12),
-			[20] = love.graphics.newFont(20),
+-- mutable widget data
+local slider= {value = .5, max = 2}
+local input = {text = "Hello"}
+local chk = {text = "Check me out"}
+
+function love.update(dt)
+	-- new layout at 100,100 with a padding of 20x20 px
+	suit.layout.reset(100,100, 20,20)
+
+	-- Button
+	state = suit.Button("Hover me!", suit.layout.row(200,30))
+	if state.entered then
+		love.audio.play(snd)
+	end
+	if state.hit then
+		print("Ouch!")
+	end
+
+	-- Input box
+	if suit.Input(input, suit.layout.row()).submitted then
+		print(input.text)
+	end
+
+	-- dynamically add widgets
+	if suit.Button("test2", suit.layout.row(nil,40)).hovered then
+		-- drawing options can be provided for each widget ... optionally
+		suit.Button("You can see", {align='left', valign='top'}, suit.layout.row(nil,30))
+		suit.Button("...but you can't touch!", {align='right', valign='bottom'}, suit.layout.row(nil,30))
+	end
+
+	-- Checkbox
+	suit.Checkbox(chk, {align='right'}, suit.layout.row())
+
+	-- nested layouts
+	suit.layout.push(suit.layout.row())
+		suit.Slider(slider, suit.layout.col(160, 20))
+		suit.Label(("%.02f"):format(slider.value), suit.layout.col(40))
+	suit.layout.pop()
+
+	-- image buttons
+	suit.ImageButton({normal, hot = hot}, suit.layout.row(200,100))
+
+	if chk.checked then
+		-- precomputed layout can fill up available space
+		suit.layout.reset()
+		rows = suit.layout.rows{pos = {400,100},
+			min_height = 300,
+			{200, 30},
+			{30, 'fill'},
+			{200, 30},
 		}
-		love.graphics.setBackgroundColor(17,17,17)
-		love.graphics.setFont(fonts[12])
+		suit.Label("You uncovered the secret!", {align="left", font = smallerFont}, rows.item(1))
+		suit.Label(slider.value, {align='left'}, rows.item(3))
 
-		-- group defaults
-		gui.group.default.size[1] = 150
-		gui.group.default.size[2] = 25
-		gui.group.default.spacing = 5
+		-- give different id to slider on same object so they don't grab
+		-- each others user interaction
+		suit.Slider(slider, {id = 'vs', vertical=true}, rows.item(2))
+		print(rows.item(3))
 	end
+end
 
-	local menu_open = {
-		main  = false,
-		right = false,
-		foo   = false,
-		demo  = false
-	}
-	local check1   = false
-	local check2   = false
-	local input    = {text = ""}
-	local slider   = {value = .5}
-	local slider2d = {value = {.5,.5}}
+function love.draw()
+	-- draw the gui
+	suit.core.draw()
+end
 
-	function love.update(dt)
-		gui.group.push{grow = "down", pos = {5,5}}
+-- forward keyboard events
+function love.textinput(t)
+	suit.core.textinput(t)
+end
 
-		-- all widgets return true if they are clicked on/activated
-		if gui.Checkbox{checked = menu_open.main, text = "Show Menu"} then
-			menu_open.main = not menu_open.main
-		end
+function love.keypressed(key)
+	suit.core.keypressed(key)
+end
 
-		if menu_open.main then
-			gui.group.push{grow = "right"}
-
-			-- widgets can have custom ID's for tooltips etc (see below)
-			if gui.Button{id = "group stacking", text = "Group stacking"} then
-				menu_open.right = not menu_open.right
-			end
-
-			if menu_open.right then
-				gui.group.push{grow = "up"}
-				if gui.Button{text = "Foo"} then
-					menu_open.foo = not menu_open.foo
-				end
-				if menu_open.foo then
-					gui.Button{text = "???"}
-				end
-				gui.group.pop{}
-
-				gui.Button{text = "Bar"}
-				gui.Button{text = "Baz"}
-			end
-			gui.group.pop{}
-
-			if gui.Button{text = "Widget demo"} then
-				menu_open.demo = not menu_open.open
-			end
-
-		end
-		gui.group.pop{}
-
-		if menu_open.demo then
-			gui.group{grow = "down", pos = {200, 80}, function()
-				love.graphics.setFont(fonts[20])
-				gui.Label{text = "Widgets"}
-				love.graphics.setFont(fonts[12])
-				gui.group{grow = "right", function()
-					gui.Button{text = "Button"}
-					gui.Button{text = "Tight Button", size = {"tight"}}
-					gui.Button{text = "Tight² Button", size = {"tight", "tight"}}
-				end}
-
-				gui.group{grow = "right", function()
-					gui.Button{text = "", size = {2}} -- acts as separator
-					gui.Label{text = "Tight Label", size = {"tight"}}
-					gui.Button{text = "", size = {2}}
-					gui.Label{text = "Center Label", align = "center"}
-					gui.Button{text = "", size = {2}}
-					gui.Label{text = "Another Label"}
-					gui.Button{text = "", size = {2}}
-				end}
-
-				gui.group.push{grow = "right"}
-				if gui.Checkbox{checked = check1, text = "Checkbox", size = {"tight"}} then
-					check1 = not check1
-					print(check1)
-				end
-				if gui.Checkbox{checked = check2, text = "Another Checkbox"} then
-					check2 = not check2
-				end
-				if gui.Checkbox{checked = check2, text = "Linked Checkbox"} then
-					check2 = not check2
-				end
-				gui.group.pop{}
-
-				gui.group{grow = "right", function()
-					gui.Label{text = "Input", size = {70}}
-					gui.Input{info = input, size = {300}}
-				end}
-
-				gui.group{grow = "right", function()
-					gui.Label{text = "Slider", size = {70}}
-					gui.Slider{info = slider}
-					gui.Label{text = ("Value: %.2f"):format(slider.value), size = {70}}
-				end}
-
-				gui.Label{text = "2D Slider", pos = {nil,10}}
-				gui.Slider2D{info = slider2d, size = {250, 250}}
-				gui.Label{text = ("Value: %.2f, %.2f"):format(slider2d.value[1], slider2d.value[2])}
-			end}
-		end
-
-		-- tooltip (see above)
-		if gui.mouse.isHot('group stacking') then
-			local mx,my = love.mouse.getPosition()
-			gui.Label{text = 'Demonstrates group stacking', pos = {mx+10,my-20}}
-		end
+-- generate assets (see love.load)
+function generateClickySound()
+	local snd = love.sound.newSoundData(512, 44100, 16, 1)
+	for i = 0,snd:getSampleCount()-1 do
+		local t = i / 44100
+		local s = i / snd:getSampleCount()
+		snd:setSample(i, (.7*(2*love.math.random()-1) + .3*math.sin(t*9000*math.pi)) * (1-s)^1.2 * .3)
 	end
+	return love.audio.newSource(snd)
+end
 
-	function love.draw()
-		gui.core.draw()
-	end
-
-	function love.keypressed(key, code)
-		gui.keyboard.pressed(key)
-		-- LÖVE 0.8: see if this code can be converted in a character
-		if pcall(string.char, code) and code > 0 then
-			gui.keyboard.textinput(string.char(code))
+function generateImageButton()
+	local normal, hot = love.image.newImageData(200,100), love.image.newImageData(200,100)
+	normal:mapPixel(function(x,y)
+		local d = (x/200-.5)^2 + (y/100-.5)^2
+		if d < .12 then
+			return 200,160,20,255
 		end
-	end
-
-	-- LÖVE 0.9
-	function love.textinput(str)
-		gui.keyboard.textinput(str)
-	end
-
-# Documentation
-
-To be done...
-
-
-# License
-
-Copyright (c) 2012 Matthias Richter
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-Except as contained in this notice, the name(s) of the above copyright holders
-shall not be used in advertising or otherwise to promote the sale, use or
-other dealings in this Software without prior written authorization.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
-[LOVE]: http://love2d.org
-[IMGUI]: http://www.mollyrocket.com/forums/viewforum.php?f=10
-[Sol]: http://sol.gfxile.net/imgui/
+		return 0,0,0,0
+	end)
+	hot:mapPixel(function(x,y)
+		local d = (x/200-.5)^2 + (y/100-.5)^2
+		if d < .13 then
+			return 255,255,255,255
+		end
+		return 0,0,0,0
+	end)
+	return love.graphics.newImage(normal), love.graphics.newImage(hot)
+end
+```

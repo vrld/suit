@@ -1,80 +1,79 @@
---[[
-Copyright (c) 2012 Matthias Richter
+-- This file is part of QUI, copyright (c) 2016 Matthias Richter
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+local BASE = (...):match('(.-)[^%.]+$')
+local core = require(BASE .. 'core')
+local utf8 = require 'utf8'
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+local function split(str, pos)
+	local offset = utf8.offset(str, pos)
+	return str:sub(1, offset-1), str:sub(offset)
+end
 
-Except as contained in this notice, the name(s) of the above copyright holders
-shall not be used in advertising or otherwise to promote the sale, use or
-other dealings in this Software without prior written authorization.
+return function(input, ...)
+	local font = love.graphics.getFont()
+	local opt, x,y,w,h = core.getOptionsAndSize(...)
+	opt.id = opt.id or input
+	opt.font = opt.font or love.graphics.getFont()
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-]]--
+	w = w or opt.font:getWidth(text) + 4
+	h = h or opt.font:getHeight() + 4
 
-local BASE = (...):match("(.-)[^%.]+$")
-local core     = require(BASE .. 'core')
-local group    = require(BASE .. 'group')
-local mouse    = require(BASE .. 'mouse')
-local keyboard = require(BASE .. 'keyboard')
-local utf8     = require(BASE .. 'utf8')
+	input.text = input.text or ""
+	input.cursor = math.max(1, math.min(utf8.len(input.text)+1, input.cursor or utf8.len(input.text)+1))
+	-- cursor is position *before* the character (including EOS) i.e. in "hello":
+	--   position 1: |hello
+	--   position 2: h|ello
+	--   ...
+	--   position 6: hello|
 
--- {info = {text = "", cursor = text:len()}, pos = {x, y}, size={w, h}, widgetHit=widgetHit, draw=draw}
-return function(w)
-	assert(type(w) == "table" and type(w.info) == "table", "Invalid argument")
-	w.info.text = w.info.text or ""
-	w.info.cursor = math.min(w.info.cursor or w.info.text:len(), w.info.text:len())
+	core.registerHitbox(opt.id, x,y,w,h)
 
-	local id = w.id or core.generateID()
-	local pos, size = group.getRect(w.pos, w.size)
-	mouse.updateWidget(id, pos, size, w.widgetHit)
-	keyboard.makeCyclable(id)
-	if mouse.isActive(id) then keyboard.setFocus(id) end
+	core.grabKeyboardFocus(opt.id)
+	opt.hasKeyboardFocus = core.hasKeyboardFocus(opt.id)
 
-	if not keyboard.hasFocus(id) then
-		--[[nothing]]
-	-- editing
-	elseif keyboard.key == 'backspace' and w.info.cursor > 0 then
-		w.info.cursor = math.max(0, w.info.cursor-1)
-		local left, right = utf8.split(w.info.text, w.info.cursor)
-		w.info.text = left .. utf8.sub(right, 2)
-	elseif keyboard.key == 'delete' then
-		local left, right = utf8.split(w.info.text, w.info.cursor)
-		w.info.text = left .. utf8.sub(right, 2)
-		w.info.cursor = math.min(w.info.text:len(), w.info.cursor)
-	-- movement
-	elseif keyboard.key == 'left' then
-		w.info.cursor = math.max(0, w.info.cursor-1)
-	elseif keyboard.key == 'right' then
-		w.info.cursor = math.min(w.info.text:len(), w.info.cursor+1)
-	elseif keyboard.key == 'home' then
-		w.info.cursor = 0
-	elseif keyboard.key == 'end' then
-		w.info.cursor = w.info.text:len()
-	-- info
-	elseif keyboard.key == 'return' then
-		keyboard.clearFocus()
-		keyboard.pressed('', -1)
-	elseif keyboard.str then
-		local left, right = utf8.split(w.info.text, w.info.cursor)
-		w.info.text = left .. keyboard.str .. right
-		w.info.cursor = w.info.cursor + 1
+	if opt.hasKeyboardFocus then
+		local keycode,char = core.getPressedKey()
+		-- text input
+		if char ~= "" then
+			local a,b = split(input.text, input.cursor)
+			input.text = table.concat{a, char, b}
+			input.cursor = input.cursor + 1
+		end
+
+		-- text editing
+		if keycode == 'backspace' then
+			local a,b = split(input.text, input.cursor)
+			input.text = table.concat{split(a,utf8.len(a)), b}
+			input.cursor = math.max(1, input.cursor-1)
+		elseif keycode == 'delete' then
+			local a,b = split(input.text, input.cursor)
+			local _,b = split(b, 2)
+			input.text = table.concat{a, b}
+		end
+
+		-- cursor movement
+		if keycode =='left' then
+			input.cursor = math.max(0, input.cursor-1)
+		elseif keycode =='right' then -- cursor movement
+			input.cursor = math.min(utf8.len(input.text)+1, input.cursor+1)
+		elseif keycode =='home' then -- cursor movement
+			input.cursor = 1
+		elseif keycode =='end' then -- cursor movement
+			input.cursor = utf8.len(input.text)+1
+		end
+
+		-- mouse cursor position
+		-- TODO
 	end
 
-	core.registerDraw(id, w.draw or core.style.Input,
-		w.info.text, w.info.cursor, pos[1],pos[2], size[1],size[2])
+	core.registerDraw(core.theme.Input, input, opt, x,y,w,h)
 
-	return mouse.releasedOn(id) or keyboard.pressedOn(id, 'return')
+	return {
+		id = opt.id,
+		hit = core.mouseReleasedOn(opt.id),
+		submitted = core.keyPressedOn(opt.id, "return"),
+		hovered = core.isHot(opt.id),
+		entered = core.isHot(opt.id) and not core.wasHot(opt.id),
+		left = not core.isHot(opt.id) and core.wasHot(opt.id)
+	}
 end

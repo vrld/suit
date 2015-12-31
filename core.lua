@@ -1,127 +1,162 @@
---[[
-Copyright (c) 2012 Matthias Richter
+-- This file is part of QUI, copyright (c) 2016 Matthias Richter
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+local BASE = (...):match('(.-)[^%.]+$')
+local theme = require(BASE..'theme')
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-Except as contained in this notice, the name(s) of the above copyright holders
-shall not be used in advertising or otherwise to promote the sale, use or
-other dealings in this Software without prior written authorization.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-]]--
-
-local BASE = (...):match("(.-)[^%.]+$")
-local group    = require(BASE .. 'group')
-local mouse    = require(BASE .. 'mouse')
-local keyboard = require(BASE .. 'keyboard')
-
---
--- Helper functions
---
-
--- evaluates all arguments
-local function strictAnd(...)
-	local n = select("#", ...)
-	local ret = true
-	for i = 1,n do ret = select(i, ...) and ret end
-	return ret
-end
-
-local function strictOr(...)
-	local n = select("#", ...)
-	local ret = false
-	for i = 1,n do ret = select(i, ...) or ret end
-	return ret
-end
-
---
--- Widget ID
---
-local maxid, uids = 0, {}
-setmetatable(uids, {__index = function(t, i)
-	t[i] = {}
-	return t[i]
-end})
-
-local function generateID()
-	maxid = maxid + 1
-	return uids[maxid]
-end
-
---
--- Drawing / Frame update
---
-local draw_items = {n = 0}
-local function registerDraw(id, f, ...)
-	assert(type(f) == 'function' or (getmetatable(f) or {}).__call,
-	       'Drawing function is not a callable type!')
-
-	local font = love.graphics.getFont()
-
-	local state = 'normal'
-	if mouse.isHot(id) or keyboard.hasFocus(id) then
-		state = mouse.isActive(id) and 'active' or 'hot'
+-- helper
+local function getOptionsAndSize(opt, ...)
+	if type(opt) == "table" then
+		return opt, ...
 	end
-	local rest = {n = select('#', ...), ...}
-	draw_items.n = draw_items.n + 1
-	draw_items[draw_items.n] = function()
-		if font then love.graphics.setFont(font) end
-		f(state, unpack(rest, 1, rest.n))
+	return {}, opt, ...
+end
+
+-- gui state
+local hot, hot_last, active
+local NONE = {}
+
+local function anyHot()
+	return hot ~= nil
+end
+
+local function isHot(id)
+	return id == hot
+end
+
+local function wasHot(id)
+	return id == hot_last
+end
+
+local function isActive(id)
+	return id == active
+end
+
+-- mouse handling
+local mouse_x, mouse_y, mouse_button_down = 0,0, false
+local function mouseInRect(x,y,w,h)
+	return not (mouse_x < x or mouse_y < y or mouse_x > x+w or mouse_y > y+h)
+end
+
+local function registerMouseHit(id, ul_x, ul_y, hit)
+	if hit(mouse_x - ul_x, mouse_y - ul_y) then
+		hot = id
+		if active == nil and mouse_button_down then
+			active = id
+		end
 	end
 end
 
--- actually update-and-draw
+local function registerHitbox(id, x,y,w,h)
+	return registerMouseHit(id, x,y, function(x,y)
+		return x >= 0 and x <= w and y >= 0 and y <= h
+	end)
+end
+
+local function mouseReleasedOn(id)
+	return not mouse_button_down and isActive(id) and isHot(id)
+end
+
+local function updateMouse(x, y, button_down)
+	mouse_x, mouse_y, mouse_button_down = x,y, button_down
+end
+
+local function getMousePosition()
+	return mouse_x, mouse_y
+end
+
+-- keyboard handling
+local key_down, textchar, keyboardFocus
+local function getPressedKey()
+	return key_down, textchar
+end
+
+local function keypressed(key)
+	key_down = key
+end
+
+local function textinput(char)
+	textchar = char
+end
+
+local function grabKeyboardFocus(id)
+	if isActive(id) then
+		keyboardFocus = id
+	end
+end
+
+local function hasKeyboardFocus(id)
+	return keyboardFocus == id
+end
+
+local function keyPressedOn(id, key)
+	return hasKeyboardFocus(id) and key_down == key
+end
+
+-- state update
+local function enterFrame()
+	hot_last, hot = hot, nil
+	updateMouse(love.mouse.getX(), love.mouse.getY(), love.mouse.isDown(1))
+	key_down, textchar = nil, ""
+	grabKeyboardFocus(NONE)
+end
+
+local function exitFrame()
+	if not mouse_button_down then
+		active = nil
+	elseif active == nil then
+		active = NONE
+	end
+end
+
+-- draw
+local draw_queue = {n = 0}
+
+local function registerDraw(f, ...)
+	local args = {...}
+	local nargs = select('#', ...)
+	draw_queue.n = draw_queue.n + 1
+	draw_queue[draw_queue.n] = function()
+		f(unpack(args, 1, nargs))
+	end
+end
+
 local function draw()
-	keyboard.endFrame()
-	mouse.endFrame()
-	group.endFrame()
-
-	-- save graphics state
-	local c = {love.graphics.getColor()}
-	local f = love.graphics.getFont()
-	local lw = love.graphics.getLineWidth()
-	local ls = love.graphics.getLineStyle()
-
-	for i = 1,draw_items.n do draw_items[i]() end
-
-	-- restore graphics state
-	love.graphics.setLineWidth(lw)
-	love.graphics.setLineStyle(ls)
-	if f then love.graphics.setFont(f) end
-	love.graphics.setColor(c)
-
-	draw_items.n = 0
-	maxid = 0
-
-	group.beginFrame()
-	mouse.beginFrame()
-	keyboard.beginFrame()
+	exitFrame()
+	for i = 1,draw_queue.n do
+		draw_queue[i]()
+	end
+	draw_queue.n = 0
+	enterFrame()
 end
 
---
--- The Module
---
-return {
-	generateID   = generateID,
+local module = {
+	getOptionsAndSize = getOptionsAndSize,
 
-	style        = require((...):match("(.-)[^%.]+$") .. 'style-default'),
+	anyHot = anyHot,
+	isHot = isHot,
+	wasHot = wasHot,
+	isActive = isActive,
+
+	mouseInRect = mouseInRect,
+	registerHitbox = registerHitbox,
+	registerMouseHit = registerMouseHit,
+	mouseReleasedOn = mouseReleasedOn,
+	updateMouse = updateMouse,
+	getMousePosition = getMousePosition,
+
+	getPressedKey = getPressedKey,
+	keypressed = keypressed,
+	textinput = textinput,
+	grabKeyboardFocus = grabKeyboardFocus,
+	hasKeyboardFocus = hasKeyboardFocus,
+	keyPressedOn = keyPressedOn,
+
+	generateID = generateID,
+	enterFrame = enterFrame,
+	exitFrame = exitFrame,
 	registerDraw = registerDraw,
-	draw         = draw,
-
-	strictAnd    = strictAnd,
-	strictOr     = strictOr,
+	theme = theme,
+	draw = draw,
 }
+theme.core = module
+return module
