@@ -1,4 +1,4 @@
--- This file is part of QUI, copyright (c) 2016 Matthias Richter
+-- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local Layout = {}
 function Layout.new()
