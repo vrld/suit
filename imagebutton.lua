@@ -4,7 +4,7 @@ local BASE = (...):match('(.-)[^%.]+$')
 local core = require(BASE .. 'core')
 
 return function(...)
-	local opt, x,y,w,h = core.getOptionsAndSize(...)
+	local opt, x,y = core.getOptionsAndSize(...)
 	opt.normal = opt.normal or opt[1]
 	opt.hot = opt.hot or opt[2] or opt.normal
 	opt.active = opt.active or opt[3] or opt.hot
