@@ -151,7 +151,6 @@ local module = {
 	hasKeyboardFocus = hasKeyboardFocus,
 	keyPressedOn = keyPressedOn,
 
-	generateID = generateID,
 	enterFrame = enterFrame,
 	exitFrame = exitFrame,
 	registerDraw = registerDraw,
