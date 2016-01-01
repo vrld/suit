@@ -108,7 +108,7 @@ function theme.Input(input, opt, x,y,w,h)
 	local tw = opt.font:getWidth(input.text)
 	local cursor_pos = 0
 	if input.cursor > 1 then
-		local s = input.text:sub(0, utf8.offset(input.text, input.cursor-1))
+		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
 		cursor_pos = opt.font:getWidth(s)
 	end
 
@@ -138,7 +138,7 @@ function theme.Input(input, opt, x,y,w,h)
 	love.graphics.print(input.text, x, y+(h-th)/2)
 
 	-- cursor
-	if opt.hasFocus then
+	if opt.hasKeyboardFocus then
 		love.graphics.line(x + cursor_pos, y + (h-th)/2,
 		                   x + cursor_pos, y + (h+th)/2)
 	end
