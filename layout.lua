@@ -177,7 +177,7 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
 
 	-- finally: return layout with iterator
 	self:pop()
-	layout.item = function(self, i)
+	layout.cell = function(self, i)
 		if self ~= layout then -- allow either colon or dot syntax
 			i = self
 		end
@@ -206,14 +206,15 @@ end
 
 local instance = Layout.new()
 return setmetatable({
-	new   = Layout.new,
-	reset = function(...) return instance:reset(...) end,
-	push  = function(...) return instance:push(...) end,
-	pop   = function(...) return instance:pop(...) end,
-	row   = function(...) return instance:row(...) end,
-	col   = function(...) return instance:col(...) end,
-	rows  = function(...) return instance:rows(...) end,
-	cols  = function(...) return instance:cols(...) end,
+	new     = Layout.new,
+	reset   = function(...) return instance:reset(...) end,
+	padding = function(...) return instance:padding(...) end,
+	push    = function(...) return instance:push(...) end,
+	pop     = function(...) return instance:pop(...) end,
+	row     = function(...) return instance:row(...) end,
+	col     = function(...) return instance:col(...) end,
+	rows    = function(...) return instance:rows(...) end,
+	cols    = function(...) return instance:cols(...) end,
 }, {__call = function(_,...) return Layout.new(...) end})
 
 --[[do
