@@ -44,7 +44,7 @@ Example code
     -- generate some assets (below)
     function love.load()
         snd = generateClickySound()
-        normal, hot = generateImageButton()
+        normal, hover, active = generateImageButton()
         smallerFont = love.graphics.newFont(10)
     end
 
@@ -122,9 +122,11 @@ Example code
         --      but the image may be bigger or smaller
         -- the button shows the image `normal' when the mouse is outside the image
         --      or above a transparent pixel
-        -- the button shows the image `hot` if the mouse is above an opaque pixel
+        -- the button shows the image `hover` if the mouse is above an opaque pixel
         --      of the image `normal'
-        suit.ImageButton({normal, hot = hot}, suit.layout.row(200,100))
+        -- the button shows the image `active` if the mouse is above an opaque pixel
+        --      of the image `normal' and the mouse button is pressed
+        suit.ImageButton(normal, {hover = hover, active = active}, suit.layout.row(200,100))
 
         -- if the checkbox is checked, display a precomputed layout
         if chk.checked then
@@ -183,22 +185,24 @@ Example code
     end
 
     function generateImageButton()
-        local normal, hot = love.image.newImageData(200,100), love.image.newImageData(200,100)
-        normal:mapPixel(function(x,y)
-            local d = (x/200-.5)^2 + (y/100-.5)^2
-            if d < .12 then
-                return 200,160,20,255
+        local metaballs = function(t, r,g,b)
+            return function(x,y)
+                local px, py = 2*(x/200-.5), 2*(y/100-.5)
+                local d1 = math.exp(-((px-.6)^2 + (py-.1)^2))
+                local d2 = math.exp(-((px+.7)^2 + (py+.1)^2) * 2)
+                local d = (d1 + d2)/2
+                if d > t then
+                    return r,g,b, 255 * ((d-t) / (1-t))^.2
+                end
+                return 0,0,0,0
             end
-            return 0,0,0,0
-        end)
-        hot:mapPixel(function(x,y)
-            local d = (x/200-.5)^2 + (y/100-.5)^2
-            if d < .13 then
-                return 255,255,255,255
-            end
-            return 0,0,0,0
-        end)
-        return love.graphics.newImage(normal), love.graphics.newImage(hot)
+        end
+
+        local normal, hover, active = love.image.newImageData(200,100), love.image.newImageData(200,100), love.image.newImageData(200,100)
+        normal:mapPixel(metaballs(.48, 188,188,188))
+        hover:mapPixel(metaballs(.46, 50,153,187))
+        active:mapPixel(metaballs(.43, 255,153,0))
+        return love.graphics.newImage(normal), love.graphics.newImage(hover), love.graphics.newImage(active)
     end
 
 Indices and tables
