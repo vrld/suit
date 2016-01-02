@@ -16,7 +16,7 @@ Using `Git <http://git-scm.com>`_, you can clone the project by running::
 
     git clone git://github.com/vrld/SUIT
 
-Once done, tou can check for updates by running::
+Once done, you can check for updates by running::
 
     git pull
 
