@@ -4,31 +4,39 @@ Getting Started
 Before actually getting started, it is important to understand the motivation
 and mechanics behind SUIT:
 
-- **SUIT is an immediate mode GUI library**
+- **Immediate mode is better than retained mode**
+- **Layout does not care about widgets**
 - **Less is more**
-- **Layouting must be easy**
 
 Immediate mode?
 ---------------
 
 With classical (retained) mode libraries you typically have a stage where you
-create the whole UI when the program initializes. After that point, the GUI
-is expected to not change very much.
+create the whole UI when the program initializes.  This includes what happens
+when events like button presses or slider changes occur.  After that point, the
+GUI is expected to not change very much.  This is great for word processors
+where the interaction is consistent and straightforward, but bad for games,
+where everything changes all the time.
 
 With immediate mode libraries, on the other hand, the GUI is created every
-frame from scratch. There are no widget objects, only functions that draw the
-widget and update some internal GUI state. This allows to put the widgets in
-their immediate conceptual context (instead of a construction stage). It also
-makes the UI very flexible: Don't want to draw a widget? Simply remove the
-call. Handling the mutable data (e.g., text of an input box) of each widget is
-your responsibility. This separation of data and behaviour gives you greater
-control of what is happening when an where, but can take a bit of time getting
-used to - especially if you have used retained mode libraries before.
+frame from scratch.  Because that would be wasteful, there are no widget
+objects.  Instead, widgets are created by functions that react to UI state and
+present some data.  Where this data comes from and how it is maintained does
+not concern the widget at all.  This is, after all, your job.  This gives great
+control over what is shown where and when.  The widget code can be right next
+to the code that does what should happen if the widget state changes.  The
+layout is also very flexible: adding a widget is one more function call, and if
+you want to hide a widget, you simply don't call the corresponding function.
+
+This separation of data and behaviour is great when a lot of stuff is going on,
+but takes a bit of time getting used to.
+
 
 What SUIT is
 ^^^^^^^^^^^^
 
-SUIT is simple: It provides only the most important widgets for games:
+SUIT is simple: It provides only a few basic widgets that are important for
+games:
 
 - :func:`Buttons <Button>` (including :func:`Image Buttons <ImageButton>`)
 - :func:`Text Labels <Label>`
@@ -36,14 +44,14 @@ SUIT is simple: It provides only the most important widgets for games:
 - :func:`Text Input <Input>`
 - :func:`Value Sliders <Slider>`
 
-SUIT is comfortable: It features a simple, yet effective row/column-based
-layouting engine.
+SUIT is comfortable: It has a straightforward, yet effective row/column-based
+layout engine.
 
-SUIT is adaptable: You can easily alter the color scheme, change how widgets
-are drawn or swap the whole theme.
+SUIT is adaptable: It is possible to change the color scheme, single drawing
+functions for all widget or the whole theme.
 
-SUIT is hackable: The core library can be used to construct new widgets with
-relative ease.
+SUIT is hackable: Custom widgets can leverage the extensive :doc:`core library
+<core>`.
 
 **SUIT is good at games!**
 
@@ -51,22 +59,22 @@ relative ease.
 What SUIT is not
 ^^^^^^^^^^^^^^^^
 
-SUIT is not a complete GUI library: It does not provide dropdowns, sub-windows,
-radio buttons, menu bars, ribbons, etc.
+SUIT is not a complete GUI library: It does not provide dropdowns, table views,
+menu bars, modal dialogs, etc.
 
-SUIT is not a complete GUI library: SUIT spits separation of concerns, MVC and
-other good OO practices in the face.
+SUIT is not a complete GUI library: It does not have a markup language or tools
+to design a user interface.
 
-SUIT is not a complete GUI library: There is no markup language to generate or
-style the GUI.
+SUIT is not a complete GUI library: It does not take control of the runtime.
+You have to do everything yourself [1]_.
 
-**SUIT is not good at "serious" applications!**
+**SUIT is not good at word processors!**
 
 
 Hello, World
 ------------
 
-SUIT is simple: Load the library, define your GUI in ``love.update()``, and
+SUITing up is is straightforward: Define your GUI in ``love.update()``, and
 draw it in ``love.draw()``::
 
     suit = require 'suit'
@@ -78,6 +86,7 @@ draw it in ``love.draw()``::
             show_message = true
         end
 
+        -- if the button was pressed at least one time, but a label below
         if show_message then
             suit.Label("How are you today?", 100,150, 300,30)
         end
@@ -87,31 +96,37 @@ draw it in ``love.draw()``::
         suit.core.draw()
     end
 
-As you can see, each widget is created by a function call (:func:`suit.Button
-<Button>` and :func:`suit.Label <Label>`). The first argument is always the
-"payload" of the widget, and the last four arguments define the position and
-dimension of the widget. The widget returns a table indicating their updated
-GUI state. The most important is ``hit``, which signals that the mouse was
-clicked and released on the widget. See :doc:`Widgets <widgets>` for more info.
+As written above, the two widgets are each created by a function call
+(:func:`suit.Button <Button>` and :func:`suit.Label <Label>`).  The first
+argument to a widget function is always the "payload" of the widget, and the
+last four arguments define the position and dimension of the widget.  The
+function returns a table that indicates the UI state of the widget.
+Here, the state ``hit`` is used to figure out if the mouse was clicked and
+released on the button.  See :doc:`Widgets <widgets>` for more info on widget
+states.
 
 Mutable state
 -------------
 
-Widgets that mutate some state - input boxes and sliders - receive a table
-argument as payload, e.g.::
+Widgets that mutate some state - input boxes, checkboxes and sliders - receive
+a table argument as payload, e.g.::
 
-    local slider = {value = 1, max = 2}
+    local slider = {value = 1, min = 0, max = 2}
     function love.update(dt)
         suit.Slider(slider, 100,100, 200,30)
         suit.Label(tostring(slider.value), 300,100, 100,30)
     end
 
+The widget function updates the payload when some user interaction occurs.  In
+the above example, ``slider.value`` may be changed by the :func:`Slider`
+widget.  The value is then shown by a :func:`Label` next to the slider.
+
 Options
 -------
 
-You can define optional, well, options after the payload. These options usually
-affect how the widget is drawn. For example, to align the label text to the
-left in the above example, you would write::
+You can define optional, well, options after the payload.  Most options affect
+how the widget is drawn.  For example, to align the label text to the left in
+the above example, you would write::
 
     local slider = {value = 1, max = 2}
     function love.update(dt)
@@ -119,14 +134,14 @@ left in the above example, you would write::
         suit.Label(tostring(slider.value), {align = "left"}, 300,100, 100,30)
     end
 
-Which options are available and what they are doing depends on the widget and
-the theme.
+What options are available and what they are doing depends on the widget and
+the theme.  See :doc:`Widgets <widgets>` for more info on widget options.
 
 Keyboard input
 --------------
 
-The input widget requires that you forward ``keypressed`` and ``textinput``
-events to SUIT::
+The :func:`input widget <Input>` requires that you forward the ``keypressed``
+and ``textinput`` events to SUIT::
 
     local input = {text = ""}
     function love.update(dt)
@@ -143,15 +158,22 @@ events to SUIT::
         suit.core.keypressed(key)
     end
 
+The slider widget can also react to keyboard input.  The mouse state is
+automatically updated, but you can provide your own version of reality if you
+need to.  See the :doc:`Core functions <core>` for more details.
+
 Layout
 ------
 
-It is tedious to write down the position and size of each widget. It is also
-not very easy to figure out what those numbers mean when you look at your code
-after not touching it for some time. SUIT offers a simple, yet effective
-layouting engine to put widgets in rows or columns. If you have ever dabbled
-with `Qt's <http://qt.io>`_ ``QBoxLayout``, you already know 78.42% [1]_
-of what you need to know.
+It is tedious to calculate the position and size of each widget you want to put
+on the screen.  Especially when all you want is to put three buttons beneath
+each other.  SUIT implements a simple, yet effective layout engine.  All the
+engine does is put cells next to each other (below or right).  It does not care
+what you put into those cells, but assumes that you probably need them for
+widgets.  Cells are reported by four numbers (left, top, width and height) that
+you can directly pass as the final four arguments to the widget functions.
+If you have ever dabbled with `Qt's <http://qt.io>`_ ``QBoxLayout``, you
+already know 89% [2]_ of what you need to know.
 
 The first example can be written as follows::
 
@@ -159,15 +181,20 @@ The first example can be written as follows::
 
     local show_message = false
     function love.update(dt)
-        suit.layout.reset(100,100) -- reset layout origin to x=100, y=100
-        suit.layout.padding(10,10) -- padding of 10x10 pixels
+        -- put the layout origin at position (100,100)
+        -- cells will grow down and to the right of the origin
+        suit.layout.reset(100,100)
 
-        -- add a new row with width=300 and height=30 and put a button in it
+        -- put 10 extra pixels between cells in each direction
+        suit.layout.padding(10,10)
+
+        -- construct a cell of size 300x30 px and put the button into it
         if suit.Button("Hello, World!", suit.layout.row(300,30)).hit then
             show_message = true
         end
 
-        -- add another row of the same size below the first row
+        -- add another cell below the first cell
+        -- the size of the cell is the same as the first cell
         if show_message then
             suit.Label("How are you today?", suit.layout.row())
         end
@@ -177,49 +204,52 @@ The first example can be written as follows::
         suit.core.draw()
     end
 
-At the beginning of each frame, the layout has to be reset. You can provide an
-optional starting position and padding as arguments. Rows and columns are added
-using ``layout.row(w,h)`` and ``layout.col(w,h)``. If omitted, the width and
-height of the cell are copied from the previous cell. There are also special
-identifiers that calculate the size from all cells since the last ``reset()``:
-``max``, ``min`` and ``median``. They do what you expect them to do.
+At the beginning of each frame, the layout origin (and some internal layout
+state) has to be reset.  You can also define optional padding between cells.
+Cells are added using ``layout.row(w,h)`` (which puts the new cell below the
+old cell) and ``layout.col(w,h)`` (which puts the new cell to the right of the
+old cell).  If omitted, the width and height of the new cell are copied from
+the old cell.  There are also special identifiers that calculate the size from
+the sizes of all cells that were created since the last ``reset()``: ``max``,
+``min`` and ``median``.  They do what you expect them to do.
 
-It is also possible to nest rows and columns and to let cells dynamically fill
-available space. Refer to the :doc:`Layout <layout>` documentation for more
-information.
+It is also possible to nest cells and to let cells dynamically fill the
+available space (but you have to tell how much space there is beforehand).
+Refer to the :doc:`Layout <layout>` documentation for more information.
 
 
 Themeing
 --------
 
-SUIT allows to customize the appearance of any widget (except
-:func:`ImageButton`). Each widget is drawn by a function of the same name in
-the ``theme``-table of the core module. So, a button is drawn by the function
-``suit.core.theme.Button``. You can overwrite these functions or swap the whole
-table to achieve a different look.
+SUIT lets you customize how any widget (except :func:`ImageButton`) is drawn.
+Each widget (except, :func:`you know <ImageButton>`) is drawn by a function in
+the table ``suit.core.theme``.  Conveniently, the name of the function
+responsible for drawing a widget is named after it, so, a button is drawn by
+the function ``suit.core.theme.Button``.  If you want to change how a button is
+drawn, simply overwrite the function.  If you want to redecorate completely, it
+might be easiest to start from scratch and swap the whole table.
 
-However, most of the time, especially when prototyping, you probably don't want
-to do this. For this reason, the default theme can be customized by modifying a
-color scheme, contained in the table ``suit.core.theme.color``::
+However, if you just don't like the colors, the default theme is open to change.
+It requires you to change the background (``bg``), foreground (``fg``) and
+border color of three possible widget states: ``normal``, when nothing out of
+the ordinary happened, ``hot``, when the mouse hovers above a widget, and
+``active``, when the mouse hovers above, and the mouse button is pressed (but
+not yet released) on the widget.  The colors are saved in the table
+``suit.core.theme.color``.  The default color scheme is this::
 
-    theme.color = {
+    suit.core.theme.color = {
         normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
         hot    = {bg = {98,98,98}, fg = {69,201,84},   border={30,30,30}},
         active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
     }
 
-The keys ``normal``, ``hot`` and ``active`` correspond to different widget states:
-When the mouse is above a widget, it is ``hot``, if the mouse is pressed (but
-not released) on a widget, it is ``active``, and otherwise it is in the
-``normal`` state.
-Each state defines a background (``bg``), foreground (``fg``) and border color.
-
-You can change the colors directly by overwriting the values::
+You can also do minimally invasive surgery::
 
     function love.load()
         suit.core.theme.color.normal.fg = {255,255,255}
         suit.core.theme.color.hot = {bg = {200,230,255}, {fg = {0,0,0}, border = {120,140,180}}}
     end
 
-.. [1] Determined by rigorous scientific experiments [2]_.
-.. [2] Significance level p = 0.5 [1]_.
+.. [1] But it thinks you can handle that.
+.. [2] Proportion determined by rigorous scientific experiments [3]_.
+.. [3] And theoretic reasoning. Mostly that, actually.

@@ -39,73 +39,120 @@ Example code
 ------------
 ::
 
-    suit = require 'suit'
+    local suit = require 'suit'
 
+    -- generate some assets (below)
     function love.load()
-        -- generate some assets
         snd = generateClickySound()
         normal, hot = generateImageButton()
         smallerFont = love.graphics.newFont(10)
     end
 
-    -- mutable widget data
-    local slider= {value = .5, max = 2}
+    -- data for a slider, an input box and a checkbox
+    local slider= {value = 0.5, min = -2, max = 2}
     local input = {text = "Hello"}
-    local chk = {text = "Check me out"}
+    local chk = {text = "Check?"}
 
+    -- all the UI is defined in love.update or functions that are called from here
     function love.update(dt)
-        -- new layout at 100,100 with a padding of 20x20 px
+        -- put the layout origin at position (100,100)
+        -- cells will grown down and to the right from this point
+        -- also set cell padding to 20 pixels to the right and to the bottom
         suit.layout.reset(100,100, 20,20)
 
-        -- Button
-        state = suit.Button("Hover me!", suit.layout.row(200,30))
-        if state.entered then
-            love.audio.play(snd)
-        end
-        if state.hit then
-            print("Ouch!")
-        end
+        -- put a button at the layout origin
+        -- the cell of the button has a size of 200 by 30 pixels
+        state = suit.Button("Click?", suit.layout.row(200,30))
 
-        -- Input box
+        -- if the button was entered, play a sound
+        if state.entered then love.audio.play(snd) end
+
+        -- if the button was pressed, take damage
+        if state.hit then print("Ouch!") end
+
+        -- put an input box below the button
+        -- the cell of the input box has the same size as the cell above
+        -- if the input cell is submitted, print the text
         if suit.Input(input, suit.layout.row()).submitted then
             print(input.text)
         end
 
-        -- dynamically add widgets
-        if suit.Button("test2", suit.layout.row(nil,40)).hovered then
-            -- drawing options can be provided for each widget ... optionally
+        -- put a button below the input box
+        -- the width of the cell will be the same as above, the height will be 40 px
+        if suit.Button("Hover?", suit.layout.row(nil,40)).hovered then
+            -- if the button is hovered, show two other buttons
+            -- this will shift all other ui elements down
+
+            -- put a button below the previous button
+            -- the cell height will be 30 px
+            -- the label of the button will be aligned top left
             suit.Button("You can see", {align='left', valign='top'}, suit.layout.row(nil,30))
-            suit.Button("...but you can't touch!", {align='right', valign='bottom'}, suit.layout.row(nil,30))
+
+            -- put a button below the previous button
+            -- the cell size will be the same as the one above
+            -- the label will be aligned bottom right
+            suit.Button("...but you can't touch!", {align='right', valign='bottom'},
+                                                   suit.layout.row())
         end
 
-        -- Checkbox
+        -- put a checkbox below the button
+        -- the size will be the same as above
+        -- (NOTE: height depends on whether "Hover?" is hovered)
+        -- the label "Check?" will be aligned right
         suit.Checkbox(chk, {align='right'}, suit.layout.row())
 
-        -- nested layouts
+        -- put a nested layout
+        -- the size of the cell will be as big as the cell above or as big as the
+        -- nested content, whichever is bigger
         suit.layout.push(suit.layout.row())
+
+            -- put a slider in the cell
+            -- the inner cell will be 160 px wide and 20 px high
             suit.Slider(slider, suit.layout.col(160, 20))
+
+            -- put a label that shows the slider value to the right of the slider
+            -- the width of the label will be 40 px
             suit.Label(("%.02f"):format(slider.value), suit.layout.col(40))
+
+        -- close the nested layout
         suit.layout.pop()
 
-        -- image buttons
+        -- put an image button below the nested cell
+        -- the size of the cell will be 200 by 100 px,
+        --      but the image may be bigger or smaller
+        -- the button shows the image `normal' when the mouse is outside the image
+        --      or above a transparent pixel
+        -- the button shows the image `hot` if the mouse is above an opaque pixel
+        --      of the image `normal'
         suit.ImageButton({normal, hot = hot}, suit.layout.row(200,100))
 
+        -- if the checkbox is checked, display a precomputed layout
         if chk.checked then
-            -- precomputed layout can fill up available space
-            suit.layout.reset()
-            rows = suit.layout.rows{pos = {400,100},
-                min_height = 300,
-                {200, 30},
-                {30, 'fill'},
-                {200, 30},
+            -- the precomputed layout will be 3 rows below each other
+            -- the origin of the layout will be at (400,100)
+            -- the minimal height of the layout will be 300 px
+            rows = suit.layout.rows{pos = {400,100}, min_height = 300,
+                {200, 30},    -- the first cell will measure 200 by 30 px
+                {30, 'fill'}, -- the second cell will be 30 px wide and fill the
+                              -- remaining vertical space between the other cells
+                {200, 30},    -- the third cell will be 200 by 30 px
             }
-            suit.Label("You uncovered the secret!", {align="left", font = smallerFont}, rows.cell(1))
+
+            -- the first cell will contain a witty label
+            -- the label will be aligned left
+            -- the font of the label will be smaller than the usual font
+            suit.Label("You uncovered the secret!", {align="left", font = smallerFont},
+                                                    rows.cell(1))
+
+            -- the third cell will contain a label that shows the value of the slider
             suit.Label(slider.value, {align='left'}, rows.cell(3))
 
-            -- give different id to slider on same object so they don't grab
-            -- each others user interaction
-            suit.Slider(slider, {id = 'vs', vertical=true}, rows.cell(2))
-            print(rows.cell(3))
+            -- the second cell will show a slider
+            -- the slider will operate on the same data as the first slider
+            -- the slider will be vertical instead of horizontal
+            -- the id of the slider will be 'slider two'. this is necessary, because
+            --     the two sliders should not both react to UI events
+            suit.Slider(slider, {vertical = true, id = 'slider two'}, rows.cell(2))
         end
     end
 
@@ -114,12 +161,13 @@ Example code
         suit.core.draw()
     end
 
-    -- forward keyboard events
     function love.textinput(t)
+        -- forward text input to SUIT
         suit.core.textinput(t)
     end
 
     function love.keypressed(key)
+        -- forward keypressed to SUIT
         suit.core.keypressed(key)
     end
 
