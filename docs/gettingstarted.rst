@@ -96,6 +96,10 @@ draw it in ``love.draw()``::
         suit.core.draw()
     end
 
+This will produce this UI (after clicking the button):
+
+.. image:: _static/hello-world.gif
+
 As written above, the two widgets are each created by a function call
 (:func:`suit.Button <Button>` and :func:`suit.Label <Label>`).  The first
 argument to a widget function is always the "payload" of the widget, and the
@@ -113,9 +117,11 @@ a table argument as payload, e.g.::
 
     local slider = {value = 1, min = 0, max = 2}
     function love.update(dt)
-        suit.Slider(slider, 100,100, 200,30)
-        suit.Label(tostring(slider.value), 300,100, 100,30)
+        suit.Slider(slider, 100,100, 200,20)
+        suit.Label(tostring(slider.value), 300,100, 200,20)
     end
+
+.. image:: _static/mutable-state.gif
 
 The widget function updates the payload when some user interaction occurs.  In
 the above example, ``slider.value`` may be changed by the :func:`Slider`
@@ -131,8 +137,10 @@ the above example, you would write::
     local slider = {value = 1, max = 2}
     function love.update(dt)
         suit.Slider(slider, 100,100, 200,30)
-        suit.Label(tostring(slider.value), {align = "left"}, 300,100, 100,30)
+        suit.Label(tostring(slider.value), {align = "left"}, 300,100, 200,30)
     end
+
+.. image:: _static/options.gif
 
 What options are available and what they are doing depends on the widget and
 the theme.  See :doc:`Widgets <widgets>` for more info on widget options.
@@ -157,6 +165,8 @@ and ``textinput`` events to SUIT::
     function love.keypressed(key)
         suit.core.keypressed(key)
     end
+
+.. image:: _static/keyboard.gif
 
 The slider widget can also react to keyboard input.  The mouse state is
 automatically updated, but you can provide your own version of reality if you
@@ -204,6 +214,8 @@ The first example can be written as follows::
         suit.core.draw()
     end
 
+.. image:: _static/layout.gif
+
 At the beginning of each frame, the layout origin (and some internal layout
 state) has to be reset.  You can also define optional padding between cells.
 Cells are added using ``layout.row(w,h)`` (which puts the new cell below the
@@ -230,24 +242,24 @@ drawn, simply overwrite the function.  If you want to redecorate completely, it
 might be easiest to start from scratch and swap the whole table.
 
 However, if you just don't like the colors, the default theme is open to change.
-It requires you to change the background (``bg``), foreground (``fg``) and
-border color of three possible widget states: ``normal``, when nothing out of
-the ordinary happened, ``hot``, when the mouse hovers above a widget, and
+It requires you to change the background (``bg``) and foreground (``fg``) color
+of three possible widget states: ``normal``, when nothing out of
+the ordinary happened, ``hover``, when the mouse hovers above a widget, and
 ``active``, when the mouse hovers above, and the mouse button is pressed (but
 not yet released) on the widget.  The colors are saved in the table
 ``suit.core.theme.color``.  The default color scheme is this::
 
     suit.core.theme.color = {
-        normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
-        hot    = {bg = {98,98,98}, fg = {69,201,84},   border={30,30,30}},
-        active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
+        normal = {bg = { 66, 66, 66}, fg = {188,188,188}},
+        hover  = {bg = { 50,153,187}, fg = {255,255,255}},
+        active = {bg = {255,153,  0}, fg = {225,225,225}}
     }
 
 You can also do minimally invasive surgery::
 
     function love.load()
         suit.core.theme.color.normal.fg = {255,255,255}
-        suit.core.theme.color.hot = {bg = {200,230,255}, {fg = {0,0,0}, border = {120,140,180}}}
+        suit.core.theme.color.hover = {bg = {200,230,255}, fg = {0,0,0}}
     end
 
 .. [1] But it thinks you can handle that.

@@ -37,6 +37,11 @@ Read on
 
 Example code
 ------------
+
+The following code will create this UI:
+
+.. image:: _static/demo.gif
+
 ::
 
     local suit = require 'suit'
