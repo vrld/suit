@@ -1,9 +1,6 @@
 Core Functions
 ==============
 
-.. note::
-   Work in progress...
-
 The core functions can be divided into two parts: Functions of interest to the
 user and functions of interest to the (widget) developer.
 
@@ -11,7 +8,7 @@ External Interface
 ------------------
 
 Drawing
--------
+^^^^^^^
 
 .. function:: draw()
 
