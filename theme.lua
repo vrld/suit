@@ -3,21 +3,22 @@
 local BASE = (...):match('(.-)[^%.]+$')
 
 local theme = {}
+theme.cornerRadius = 4
 
 theme.color = {
-	normal = {bg = {78,78,78}, fg = {200,200,200}, border={20,20,20}},
-	hot    = {bg = {98,98,98}, fg = {69,201,84},   border={30,30,30}},
-	active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
+	normal  = {bg = { 66, 66, 66}, fg = {188,188,188}},
+	hovered = {bg = { 50,153,187}, fg = {255,255,255}},
+	active  = {bg = {255,153,  0}, fg = {225,225,225}}
 }
 
 
 -- HELPER
 function theme.getStateName(id)
-	if theme.core.isHot(id) then
-		return 'hot'
-	end
 	if theme.core.isActive(id) then
 		return 'active'
+	end
+	if theme.core.isHot(id) then
+		return 'hovered'
 	end
 	return 'normal'
 end
@@ -29,10 +30,7 @@ end
 
 function theme.drawBox(x,y,w,h, colors)
 	love.graphics.setColor(colors.bg)
-	love.graphics.rectangle('fill', x,y, w,h)
-
-	love.graphics.setColor(colors.border)
-	love.graphics.rectangle('line', x,y, w,h)
+	love.graphics.rectangle('fill', x,y, w,h, theme.cornerRadius)
 end
 
 function theme.getVerticalOffsetForAlign(valign, font, h)
@@ -69,10 +67,12 @@ function theme.Checkbox(chk, opt, x,y,w,h)
 	local c = theme.getColorForState(opt)
 	local th = opt.font:getHeight()
 
-	theme.drawBox(x,y+(h-th)/2,th,th, c)
+	theme.drawBox(x+h/10,y+h/10,h*.8,h*.8, c)
 	love.graphics.setColor(c.fg)
 	if chk.checked then
-		love.graphics.rectangle('fill', x+3,y+(h-th)/2+3,th-6,th-6)
+		love.graphics.setLineWidth(5)
+		love.graphics.setLineJoin("bevel")
+		love.graphics.line(x+h*.2,y+h*.55, x+h*.45,y+h*.75, x+h*.8,y+h*.2)
 	end
 
 	if chk.text then
@@ -83,17 +83,28 @@ function theme.Checkbox(chk, opt, x,y,w,h)
 end
 
 function theme.Slider(fraction, opt, x,y,w,h)
-	local c = theme.getColorForState(opt)
-	love.graphics.setColor(c.bg)
-
+	local xb, yb, wb, hb -- size of the progress bar
+	local r =  math.min(w,h) / 2.1
 	if opt.vertical then
-		love.graphics.rectangle('fill', x+w/2-2,y, 4,h)
-		y = math.floor(y + h * (1 - fraction))
-		theme.drawBox(x,y-2,w,4, c)
+		x, w = x + w*.25, w*.5
+		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction
 	else
-		love.graphics.rectangle('fill', x,y+h/2-2, w,4)
-		x = math.floor(x + w * fraction)
-		theme.drawBox(x-2,y,4,h, c)
+		y, h = y + h*.25, h*.5
+		xb, yb, wb, hb = x,y, w*fraction, h
+	end
+
+	local c = theme.getColorForState(opt)
+	theme.drawBox(x,y,w,h, c)
+	love.graphics.setColor(c.fg)
+	love.graphics.rectangle('fill', x,yb,wb,hb, theme.cornerRadius)
+
+	if theme.getStateName(opt.id) ~= "normal" then
+		love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
+		if opt.vertical then
+			love.graphics.circle('fill', x+wb/2, yb, r)
+		else
+			love.graphics.circle('fill', x+wb, yb+hb/2, r)
+		end
 	end
 end
 
@@ -138,7 +149,7 @@ function theme.Input(input, opt, x,y,w,h)
 	love.graphics.print(input.text, x, y+(h-th)/2)
 
 	-- cursor
-	if opt.hasKeyboardFocus then
+	if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
 		love.graphics.line(x + cursor_pos, y + (h-th)/2,
 		                   x + cursor_pos, y + (h+th)/2)
 	end
