@@ -70,6 +70,7 @@ function theme.Checkbox(chk, opt, x,y,w,h)
 	theme.drawBox(x+h/10,y+h/10,h*.8,h*.8, c)
 	love.graphics.setColor(c.fg)
 	if chk.checked then
+		love.graphics.setLineStyle('smooth')
 		love.graphics.setLineWidth(5)
 		love.graphics.setLineJoin("bevel")
 		love.graphics.line(x+h*.2,y+h*.55, x+h*.45,y+h*.75, x+h*.8,y+h*.2)
@@ -150,6 +151,8 @@ function theme.Input(input, opt, x,y,w,h)
 
 	-- cursor
 	if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
+		love.graphics.setLineWidth(1)
+		love.graphics.setLineStyle('rough')
 		love.graphics.line(x + cursor_pos, y + (h-th)/2,
 		                   x + cursor_pos, y + (h+th)/2)
 	end
