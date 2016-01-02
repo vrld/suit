@@ -3,11 +3,11 @@
 local BASE = (...):match('(.-)[^%.]+$')
 local core = require(BASE .. 'core')
 
-return function(...)
+return function(normal, ...)
 	local opt, x,y = core.getOptionsAndSize(...)
-	opt.normal = opt.normal or opt[1]
-	opt.hot = opt.hot or opt[2] or opt.normal
-	opt.active = opt.active or opt[3] or opt.hot
+	opt.normal = normal or opt.normal or opt[1]
+	opt.hover = opt.hover or opt[2] or opt.normal
+	opt.active = opt.active or opt[3] or opt.hover
 	assert(opt.normal, "Need at least `normal' state image")
 	opt.id = opt.id or opt.normal
 
@@ -23,10 +23,10 @@ return function(...)
 	end)
 
 	local img = opt.normal
-	if core.isHot(opt.id) then
-		img = opt.hot
-	elseif core.isActive(opt.id) then
+	if core.isActive(opt.id) then
 		img = opt.active
+	elseif core.isHot(opt.id) then
+		img = opt.hover
 	end
 
 	core.registerDraw(love.graphics.setColor, 255,255,255)
@@ -35,7 +35,7 @@ return function(...)
 	return {
 		id = opt.id,
 		hit = core.mouseReleasedOn(opt.id),
-		hovered = core.isHot(opt.id),
+		hover = core.isHot(opt.id),
 		entered = core.isHot(opt.id) and not core.wasHot(opt.id),
 		left = not core.isHot(opt.id) and core.wasHot(opt.id)
 	}

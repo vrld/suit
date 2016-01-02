@@ -28,8 +28,9 @@ Creates a button widget at position ``(x,y)`` with width ``w`` and height
 
 Creates a label at position ``(x,y)`` with width ``w`` and height ``h``.
 
-.. function:: ImageButton(options, x,y)
+.. function:: ImageButton(normal, options, x,y)
 
+   :param Image notmal: Image of the button in normal state.
    :param table options: Widget options.
    :param numbers x,y: Upper left corner of the widget.
    :returns: Return state (see below).
@@ -37,9 +38,10 @@ Creates a label at position ``(x,y)`` with width ``w`` and height ``h``.
 Creates an image button widget at position ``(x,y)``.
 Unlike all other widgets, an ``ImageButton`` is not affected by the current
 theme.
-The options table must at least contain an image for the ``normal`` state.
-The pixels with non-zero alpha value define the active area of the widget.
-You can provide additional ``hot`` and ``active`` images, but the widget area
+The argument ``normal`` defines the image of the normal state as well as the
+area of the widget: The button activates when the mouse is over a pixel with
+non-zero alpha value.
+You can provide additional ``hover`` and ``active`` images, but the widget area
 is always computed from the ``normal`` image.
 
 Note that ``ImageButton`` does not recieve width and height parameters. As
@@ -48,13 +50,13 @@ such, it does not necessarily honor the cell size of a :doc:`layout`.
 **Additional Options:**
 
 ``normal``
-   Image for the normal state of the widget. Mandatory.
+   Image for the normal state of the widget. Defaults to widget payload.
 
-``hot``
+``hover``
    Image for the hot state of the widget. Defaults to ``normal`` if omitted.
 
 ``active``
-   Image for the active state of the widget. Defaults to ``
+   Image for the active state of the widget. Defaults to ``hover`` if omitted.
 
 Mutable Widgets
 ---------------
