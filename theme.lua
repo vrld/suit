@@ -6,9 +6,9 @@ local theme = {}
 theme.cornerRadius = 4
 
 theme.color = {
-	normal  = {bg = { 66, 66, 66}, fg = {188,188,188}},
-	hovered = {bg = { 50,153,187}, fg = {255,255,255}},
-	active  = {bg = {255,153,  0}, fg = {225,225,225}}
+	normal = {bg = { 66, 66, 66}, fg = {188,188,188}},
+	hover  = {bg = { 50,153,187}, fg = {255,255,255}},
+	active = {bg = {255,153,  0}, fg = {225,225,225}}
 }
 
 
@@ -18,7 +18,7 @@ function theme.getStateName(id)
 		return 'active'
 	end
 	if theme.core.isHot(id) then
-		return 'hovered'
+		return 'hover'
 	end
 	return 'normal'
 end
