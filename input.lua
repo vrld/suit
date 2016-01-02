@@ -5,7 +5,7 @@ local core = require(BASE .. 'core')
 local utf8 = require 'utf8'
 
 local function split(str, pos)
-	local offset = utf8.offset(str, pos)
+	local offset = utf8.offset(str, pos) or 0
 	return str:sub(1, offset-1), str:sub(offset)
 end
 
