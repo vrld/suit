@@ -6,26 +6,16 @@ local theme = {}
 theme.cornerRadius = 4
 
 theme.color = {
-	normal = {bg = { 66, 66, 66}, fg = {188,188,188}},
-	hover  = {bg = { 50,153,187}, fg = {255,255,255}},
-	active = {bg = {255,153,  0}, fg = {225,225,225}}
+	normal   = {bg = { 66, 66, 66}, fg = {188,188,188}},
+	hovered  = {bg = { 50,153,187}, fg = {255,255,255}},
+	active   = {bg = {255,153,  0}, fg = {225,225,225}}
 }
 
 
 -- HELPER
-function theme.getStateName(id)
-	if theme.core.isActive(id) then
-		return 'active'
-	end
-	if theme.core.isHot(id) then
-		return 'hover'
-	end
-	return 'normal'
-end
-
 function theme.getColorForState(opt)
-	local s = theme.getStateName(opt.id)
-	return (opt.color and opt.color[s]) or theme.color[s]
+	local s = opt.state or "normal"
+	return (opt.color and opt.color[opt.state]) or theme.color[s]
 end
 
 function theme.drawBox(x,y,w,h, colors)
@@ -96,10 +86,9 @@ function theme.Slider(fraction, opt, x,y,w,h)
 
 	local c = theme.getColorForState(opt)
 	theme.drawBox(x,y,w,h, c)
-	love.graphics.setColor(c.fg)
-	love.graphics.rectangle('fill', x,yb,wb,hb, theme.cornerRadius)
+	theme.drawBox(x,yb,wb,hb, {bg=c.fg})
 
-	if theme.getStateName(opt.id) ~= "normal" then
+	if opt.state ~= nil and opt.state ~= "normal" then
 		love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
 		if opt.vertical then
 			love.graphics.circle('fill', x+wb/2, yb, r)

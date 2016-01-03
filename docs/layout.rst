@@ -93,9 +93,9 @@ The specification is a table of tables, where each inner table follows the
 convention of :func:`row` and :func:`col`.
 The result is a layout definition object that can be used to access the cells.
 
-There is almost only one reason to do so: You know the area of your layout in
-advance (say, the screen size), and want certain cells to dynamically fill the
-available space.
+There are almost only two reasons to do so: (1) You know the area of your
+layout in advance (say, the screen size), and want certain cells to dynamically
+fill the available space; (2) You want to animate the cells.
 
 .. note::
     Unlike immediate mode layouts, predefined layouts **can not be nested**.
@@ -139,8 +139,7 @@ define the position (upper left corner) of the layout using the ``pos`` keyword:
 Layout Definition Objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once constructed, the layout can be executed using a layout definition object
-in two ways:
+Once constructed, the cells can be accessed in two ways:
 
 - Using iterators::
 
@@ -153,6 +152,27 @@ in two ways:
     suit.Button("Button 1", definition.cell(1))
     suit.Button("Button 3", definition.cell(3))
     suit.Button("Button 2", definition.cell(2))
+
+There is actually a third way: Because layout definitions are just tables, you
+can access the cells directly::
+
+    local cell = definition[1]
+    suit.Button("Button 1", cell[1], cell[2], cell[3], cell[4])
+    -- or suit.Button("Button 1", unpack(cell))
+
+This is especially useful if you want to animate the cells, for example with a
+`tween <http://hump.readthedocs.org/en/latest/timer.html#Timer.tween>`_::
+
+    for i,cell in ipairs(definition)
+        local destination = {[2] = cell[2]} -- save cell y position
+        cell[2] = -cell[4] -- move cell just outside of the screen
+
+        -- let the cells fall into the screen one after another
+        timer.after(i / 10, function()
+            timer.tween(0.7, cell, destination, 'bounce')
+        end)
+    end
+
 
 Constructors
 ^^^^^^^^^^^^

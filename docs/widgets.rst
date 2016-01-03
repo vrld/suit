@@ -41,7 +41,7 @@ theme.
 The argument ``normal`` defines the image of the normal state as well as the
 area of the widget: The button activates when the mouse is over a pixel with
 non-zero alpha value.
-You can provide additional ``hover`` and ``active`` images, but the widget area
+You can provide additional ``hovered`` and ``active`` images, but the widget area
 is always computed from the ``normal`` image.
 
 Note that ``ImageButton`` does not recieve width and height parameters. As
@@ -52,11 +52,11 @@ such, it does not necessarily honor the cell size of a :doc:`layout`.
 ``normal``
    Image for the normal state of the widget. Defaults to widget payload.
 
-``hover``
-   Image for the hot state of the widget. Defaults to ``normal`` if omitted.
+``hovered``
+   Image for the hovered state of the widget. Defaults to ``normal`` if omitted.
 
 ``active``
-   Image for the active state of the widget. Defaults to ``hover`` if omitted.
+   Image for the active state of the widget. Defaults to ``hovered`` if omitted.
 
 Mutable Widgets
 ---------------

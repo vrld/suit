@@ -93,7 +93,7 @@ draw it in ``love.draw()``::
     end
 
     function love.draw()
-        suit.core.draw()
+        suit.draw()
     end
 
 This will produce this UI (after clicking the button):
@@ -159,11 +159,11 @@ and ``textinput`` events to SUIT::
 
     -- forward keyboard events
     function love.textinput(t)
-        suit.core.textinput(t)
+        suit.textinput(t)
     end
 
     function love.keypressed(key)
-        suit.core.keypressed(key)
+        suit.keypressed(key)
     end
 
 .. image:: _static/keyboard.gif
@@ -193,33 +193,34 @@ The first example can be written as follows::
     function love.update(dt)
         -- put the layout origin at position (100,100)
         -- cells will grow down and to the right of the origin
-        suit.layout.reset(100,100)
+        -- note the colon syntax
+        suit.layout:reset(100,100)
 
         -- put 10 extra pixels between cells in each direction
-        suit.layout.padding(10,10)
+        suit.layout:padding(10,10)
 
         -- construct a cell of size 300x30 px and put the button into it
-        if suit.Button("Hello, World!", suit.layout.row(300,30)).hit then
+        if suit.Button("Hello, World!", suit.layout:row(300,30)).hit then
             show_message = true
         end
 
         -- add another cell below the first cell
         -- the size of the cell is the same as the first cell
         if show_message then
-            suit.Label("How are you today?", suit.layout.row())
+            suit.Label("How are you today?", suit.layout:row())
         end
     end
 
     function love.draw()
-        suit.core.draw()
+        suit.draw()
     end
 
 .. image:: _static/layout.gif
 
 At the beginning of each frame, the layout origin (and some internal layout
 state) has to be reset.  You can also define optional padding between cells.
-Cells are added using ``layout.row(w,h)`` (which puts the new cell below the
-old cell) and ``layout.col(w,h)`` (which puts the new cell to the right of the
+Cells are added using ``layout:row(w,h)`` (which puts the new cell below the
+old cell) and ``layout:col(w,h)`` (which puts the new cell to the right of the
 old cell).  If omitted, the width and height of the new cell are copied from
 the old cell.  There are also special identifiers that calculate the size from
 the sizes of all cells that were created since the last ``reset()``: ``max``,
@@ -235,31 +236,90 @@ Themeing
 
 SUIT lets you customize how any widget (except :func:`ImageButton`) is drawn.
 Each widget (except, :func:`you know <ImageButton>`) is drawn by a function in
-the table ``suit.core.theme``.  Conveniently, the name of the function
+the table ``suit.theme``.  Conveniently, the name of the function
 responsible for drawing a widget is named after it, so, a button is drawn by
-the function ``suit.core.theme.Button``.  If you want to change how a button is
+the function ``suit.theme.Button``.  If you want to change how a button is
 drawn, simply overwrite the function.  If you want to redecorate completely, it
 might be easiest to start from scratch and swap the whole table.
 
 However, if you just don't like the colors, the default theme is open to change.
 It requires you to change the background (``bg``) and foreground (``fg``) color
 of three possible widget states: ``normal``, when nothing out of
-the ordinary happened, ``hover``, when the mouse hovers above a widget, and
+the ordinary happened, ``hovered``, when the mouse hovers above a widget, and
 ``active``, when the mouse hovers above, and the mouse button is pressed (but
 not yet released) on the widget.  The colors are saved in the table
-``suit.core.theme.color``.  The default color scheme is this::
+``suit.theme.color``.  The default color scheme is this::
 
-    suit.core.theme.color = {
-        normal = {bg = { 66, 66, 66}, fg = {188,188,188}},
-        hover  = {bg = { 50,153,187}, fg = {255,255,255}},
-        active = {bg = {255,153,  0}, fg = {225,225,225}}
+    suit.theme.color = {
+        normal  = {bg = { 66, 66, 66}, fg = {188,188,188}},
+        hovered = {bg = { 50,153,187}, fg = {255,255,255}},
+        active  = {bg = {255,153,  0}, fg = {225,225,225}}
     }
 
 You can also do minimally invasive surgery::
 
     function love.load()
-        suit.core.theme.color.normal.fg = {255,255,255}
-        suit.core.theme.color.hover = {bg = {200,230,255}, fg = {0,0,0}}
+        suit.theme.color.normal.fg = {255,255,255}
+        suit.theme.color.hovered = {bg = {200,230,255}, fg = {0,0,0}}
+    end
+
+
+GUI Instances
+-------------
+
+Sometimes you might feel the need to separate parts of the GUI.  Maybe the
+widgets should have a different theme, maybe certain should always be drawn
+before or after other UI elements, or maybe you don't want the UI state to
+"leak" (e.g., from a stacked pause gamestate to the main gamestate).
+
+For this reason, SUIT allows you to create GUI instances::
+
+    local dress = suit.new()
+
+The IO and layout state of ``dress`` is totally contained in the instance and
+does not affect any other instances (including the "global" instance ``suit``).
+In particular, ``suit.draw()`` will not draw anything from ``dress``.  Luckily,
+you can do that yourself::
+
+    dress:draw()
+
+Notice that instances require that you use the colon syntax.  This is true for
+every `core <core>` function as well as the widgets.  To create a button, for
+example, you have to write::
+
+    dress:Button("Click?", dress.layout:row())
+
+.. _instance-theme:
+
+Instance Theme
+^^^^^^^^^^^^^^
+
+Unlike UI and layout state, themes **are** shared among instances.  The reason
+is that the ``suit.theme`` and ``dress.theme`` are **references**, and point to
+the same table (unless you make either of them point somewhere else).  Usually
+this is a feature, but please still consider this
+
+.. warning::
+
+   Changes in a shared theme will be shared across GUI instances.
+
+If this is an issue---for example because you only want to change the color
+scheme of an instance---you can either `deep-copy
+<http://hump.readthedocs.org/en/latest/class.html#class:clone>`_ the theme
+table or use some metatable magic::
+
+    dress.theme = setmetatable({}, {__index = suit.theme})
+
+    -- NOTE: you have to replace the whole color table. E.g., replacing only
+    --       dress.theme.color.normal will also change suit.theme.color.normal!
+    dress.theme.color = {
+        normal   = {bg = {188,188,188}, fg = { 66, 66, 66}},
+        hovered  = {bg = {255,255,255}, fg = { 50,153,187}},
+        active   = {bg = {255,255,255}, fg = {225,153,  0}}
+    }
+
+    function dress.theme.Label(text, opt, x,y,w,h)
+        -- draw the label in a fancier way
     end
 
 .. [1] But it thinks you can handle that.

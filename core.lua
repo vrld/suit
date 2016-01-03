@@ -1,10 +1,34 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
+local NONE = {}
 local BASE = (...):match('(.-)[^%.]+$')
-local theme = require(BASE..'theme')
+local default_theme = require(BASE..'theme')
+
+local suit = {}
+suit.__index = suit
+
+function suit.new(theme)
+	return setmetatable({
+		-- TODO: deep copy/copy on write? better to let user handle => documentation?
+		theme = theme or default_theme,
+		mouse_x = 0, mouse_y = 0,
+		mouse_button_down = false,
+
+		draw_queue = {n = 0},
+
+		Button = require(BASE.."button"),
+		ImageButton = require(BASE.."imagebutton"),
+		Label = require(BASE.."label"),
+		Checkbox = require(BASE.."checkbox"),
+		Input = require(BASE.."input"),
+		Slider = require(BASE.."slider"),
+
+		layout = require(BASE.."layout").new(),
+	}, suit)
+end
 
 -- helper
-local function getOptionsAndSize(opt, ...)
+function suit.getOptionsAndSize(opt, ...)
 	if type(opt) == "table" then
 		return opt, ...
 	end
@@ -12,75 +36,83 @@ local function getOptionsAndSize(opt, ...)
 end
 
 -- gui state
-local hot, hot_last, active
-local NONE = {}
-
-local function anyHot()
-	return hot ~= nil
+function suit:anyHovered()
+	return self.hovered ~= nil
 end
 
-local function isHot(id)
-	return id == hot
+function suit:isHovered(id)
+	return id == self.hovered
 end
 
-local function wasHot(id)
-	return id == hot_last
+function suit:wasHovered(id)
+	return id == self.hovered_last
 end
 
-local function isActive(id)
-	return id == active
+function suit:isActive(id)
+	return id == self.active
+end
+
+function suit:getStateName(id)
+	if self:isActive(id) then
+		return "active"
+	elseif self:isHovered(id) then
+		return "hovered"
+	end
+	return "normal"
 end
 
 -- mouse handling
-local mouse_x, mouse_y, mouse_button_down = 0,0, false
-local function mouseInRect(x,y,w,h)
-	return not (mouse_x < x or mouse_y < y or mouse_x > x+w or mouse_y > y+h)
+function suit:mouseInRect(x,y,w,h)
+	return self.mouse_x >= x and self.mouse_y >= y and
+	       self.mouse_x <= x+w and self.mouse_y > y+h
 end
 
-local function registerMouseHit(id, ul_x, ul_y, hit)
-	if hit(mouse_x - ul_x, mouse_y - ul_y) then
-		hot = id
-		if active == nil and mouse_button_down then
-			active = id
+function suit:registerMouseHit(id, ul_x, ul_y, hit)
+	if hit(self.mouse_x - ul_x, self.mouse_y - ul_y) then
+		self.hovered = id
+		if self.active == nil and self.mouse_button_down then
+			self.active = id
 		end
 	end
+	return self:getStateName(id)
 end
 
-local function registerHitbox(id, x,y,w,h)
-	return registerMouseHit(id, x,y, function(x,y)
+function suit:registerHitbox(id, x,y,w,h)
+	return self:registerMouseHit(id, x,y, function(x,y)
 		return x >= 0 and x <= w and y >= 0 and y <= h
 	end)
 end
 
-local function mouseReleasedOn(id)
-	return not mouse_button_down and isActive(id) and isHot(id)
+function suit:mouseReleasedOn(id)
+	return not self.mouse_button_down and self:isActive(id) and self:isHovered(id)
 end
 
-local function updateMouse(x, y, button_down)
-	mouse_x, mouse_y, mouse_button_down = x,y, button_down
+function suit:updateMouse(x, y, button_down)
+	self.mouse_x, self.mouse_y = x,y
+	if button_down ~= nil then
+		self.mouse_button_down = button_down
+	end
 end
 
-local function getMousePosition()
-	return mouse_x, mouse_y
+function suit:getMousePosition()
+	return self.mouse_x, self.mouse_y
 end
 
 -- keyboard handling
-local key_down, textchar, keyboardFocus
-local function getPressedKey()
-	return key_down, textchar
+function suit:getPressedKey()
+	return self.key_down, self.textchar
 end
 
-local function keypressed(key)
-	key_down = key
+function suit:keypressed(key)
+	self.key_down = key
 end
 
-local function textinput(char)
-	textchar = char
+function suit:textinput(char)
+	self.textchar = char
 end
 
-local function grabKeyboardFocus(id)
-	if isActive(id) then
-		keyboardFocus = id
+function suit:grabKeyboardFocus(id)
+	if self:isActive(id) then
 		if love.system.getOS() == "Android" or love.system.getOS() == "iOS" then
 			if id == NONE then
 				love.keyboard.setTextInput( false )
@@ -88,81 +120,52 @@ local function grabKeyboardFocus(id)
 				love.keyboard.setTextInput( true )
 			end
 		end
+		self.keyboardFocus = id
 	end
+	return self:hasKeyboardFocus(id)
 end
 
-local function hasKeyboardFocus(id)
-	return keyboardFocus == id
+function suit:hasKeyboardFocus(id)
+	return self.keyboardFocus == id
 end
 
-local function keyPressedOn(id, key)
-	return hasKeyboardFocus(id) and key_down == key
+function suit:keyPressedOn(id, key)
+	return self:hasKeyboardFocus(id) and self.key_down == key
 end
 
 -- state update
-local function enterFrame()
-	hot_last, hot = hot, nil
-	updateMouse(love.mouse.getX(), love.mouse.getY(), love.mouse.isDown(1))
-	key_down, textchar = nil, ""
-	grabKeyboardFocus(NONE)
+function suit:enterFrame()
+	self.hovered_last, self.hovered = self.hovered, nil
+	self:updateMouse(love.mouse.getX(), love.mouse.getY(), love.mouse.isDown(1))
+	self.key_down, self.textchar = nil, ""
+	self:grabKeyboardFocus(NONE)
 end
 
-local function exitFrame()
-	if not mouse_button_down then
-		active = nil
-	elseif active == nil then
-		active = NONE
+function suit:exitFrame()
+	if not self.mouse_button_down then
+		self.active = nil
+	elseif self.active == nil then
+		self.active = NONE
 	end
 end
 
 -- draw
-local draw_queue = {n = 0}
-
-local function registerDraw(f, ...)
+function suit:registerDraw(f, ...)
 	local args = {...}
 	local nargs = select('#', ...)
-	draw_queue.n = draw_queue.n + 1
-	draw_queue[draw_queue.n] = function()
+	self.draw_queue.n = self.draw_queue.n + 1
+	self.draw_queue[self.draw_queue.n] = function()
 		f(unpack(args, 1, nargs))
 	end
 end
 
-local function draw()
-	exitFrame()
-	for i = 1,draw_queue.n do
-		draw_queue[i]()
+function suit:draw()
+	self:exitFrame()
+	for i = 1,self.draw_queue.n do
+		self.draw_queue[i]()
 	end
-	draw_queue.n = 0
-	enterFrame()
+	self.draw_queue.n = 0
+	self:enterFrame()
 end
 
-local module = {
-	getOptionsAndSize = getOptionsAndSize,
-
-	anyHot = anyHot,
-	isHot = isHot,
-	wasHot = wasHot,
-	isActive = isActive,
-
-	mouseInRect = mouseInRect,
-	registerHitbox = registerHitbox,
-	registerMouseHit = registerMouseHit,
-	mouseReleasedOn = mouseReleasedOn,
-	updateMouse = updateMouse,
-	getMousePosition = getMousePosition,
-
-	getPressedKey = getPressedKey,
-	keypressed = keypressed,
-	textinput = textinput,
-	grabKeyboardFocus = grabKeyboardFocus,
-	hasKeyboardFocus = hasKeyboardFocus,
-	keyPressedOn = keyPressedOn,
-
-	enterFrame = enterFrame,
-	exitFrame = exitFrame,
-	registerDraw = registerDraw,
-	theme = theme,
-	draw = draw,
-}
-theme.core = module
-return module
+return suit

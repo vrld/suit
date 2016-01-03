@@ -1,7 +1,6 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local BASE = (...):match('(.-)[^%.]+$')
-local core = require(BASE .. 'core')
 local utf8 = require 'utf8'
 
 local function split(str, pos)
@@ -9,7 +8,7 @@ local function split(str, pos)
 	return str:sub(1, offset-1), str:sub(offset)
 end
 
-return function(input, ...)
+return function(core, input, ...)
 	local font = love.graphics.getFont()
 	local opt, x,y,w,h = core.getOptionsAndSize(...)
 	opt.id = opt.id or input
@@ -26,13 +25,11 @@ return function(input, ...)
 	--   ...
 	--   position 6: hello|
 
-	core.registerHitbox(opt.id, x,y,w,h)
-
-	core.grabKeyboardFocus(opt.id)
-	opt.hasKeyboardFocus = core.hasKeyboardFocus(opt.id)
+	opt.state = core:registerHitbox(opt.id, x,y,w,h)
+	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
 	if opt.hasKeyboardFocus then
-		local keycode,char = core.getPressedKey()
+		local keycode,char = core:getPressedKey()
 		-- text input
 		if char ~= "" then
 			local a,b = split(input.text, input.cursor)
@@ -66,14 +63,14 @@ return function(input, ...)
 		-- TODO
 	end
 
-	core.registerDraw(core.theme.Input, input, opt, x,y,w,h)
+	core:registerDraw(core.theme.Input, input, opt, x,y,w,h)
 
 	return {
 		id = opt.id,
-		hit = core.mouseReleasedOn(opt.id),
-		submitted = core.keyPressedOn(opt.id, "return"),
-		hovered = core.isHot(opt.id),
-		entered = core.isHot(opt.id) and not core.wasHot(opt.id),
-		left = not core.isHot(opt.id) and core.wasHot(opt.id)
+		hit = core:mouseReleasedOn(opt.id),
+		submitted = core:keyPressedOn(opt.id, "return"),
+		hovered = core:isHovered(opt.id),
+		entered = core:isHovered(opt.id) and not core:wasHovered(opt.id),
+		left = not core:isHovered(opt.id) and core:wasHovered(opt.id)
 	}
 end

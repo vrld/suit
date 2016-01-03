@@ -49,7 +49,7 @@ The following code will create this UI:
     -- generate some assets (below)
     function love.load()
         snd = generateClickySound()
-        normal, hover, active = generateImageButton()
+        normal, hovered, active = generateImageButton()
         smallerFont = love.graphics.newFont(10)
     end
 
@@ -63,11 +63,11 @@ The following code will create this UI:
         -- put the layout origin at position (100,100)
         -- cells will grown down and to the right from this point
         -- also set cell padding to 20 pixels to the right and to the bottom
-        suit.layout.reset(100,100, 20,20)
+        suit.layout:reset(100,100, 20,20)
 
         -- put a button at the layout origin
         -- the cell of the button has a size of 200 by 30 pixels
-        state = suit.Button("Click?", suit.layout.row(200,30))
+        state = suit.Button("Click?", suit.layout:row(200,30))
 
         -- if the button was entered, play a sound
         if state.entered then love.audio.play(snd) end
@@ -78,67 +78,67 @@ The following code will create this UI:
         -- put an input box below the button
         -- the cell of the input box has the same size as the cell above
         -- if the input cell is submitted, print the text
-        if suit.Input(input, suit.layout.row()).submitted then
+        if suit.Input(input, suit.layout:row()).submitted then
             print(input.text)
         end
 
         -- put a button below the input box
         -- the width of the cell will be the same as above, the height will be 40 px
-        if suit.Button("Hover?", suit.layout.row(nil,40)).hovered then
+        if suit.Button("Hover?", suit.layout:row(nil,40)).hovered then
             -- if the button is hovered, show two other buttons
             -- this will shift all other ui elements down
 
             -- put a button below the previous button
             -- the cell height will be 30 px
             -- the label of the button will be aligned top left
-            suit.Button("You can see", {align='left', valign='top'}, suit.layout.row(nil,30))
+            suit.Button("You can see", {align='left', valign='top'}, suit.layout:row(nil,30))
 
             -- put a button below the previous button
             -- the cell size will be the same as the one above
             -- the label will be aligned bottom right
             suit.Button("...but you can't touch!", {align='right', valign='bottom'},
-                                                   suit.layout.row())
+                                                   suit.layout:row())
         end
 
         -- put a checkbox below the button
         -- the size will be the same as above
         -- (NOTE: height depends on whether "Hover?" is hovered)
         -- the label "Check?" will be aligned right
-        suit.Checkbox(chk, {align='right'}, suit.layout.row())
+        suit.Checkbox(chk, {align='right'}, suit.layout:row())
 
         -- put a nested layout
         -- the size of the cell will be as big as the cell above or as big as the
         -- nested content, whichever is bigger
-        suit.layout.push(suit.layout.row())
+        suit.layout:push(suit.layout:row())
 
             -- put a slider in the cell
             -- the inner cell will be 160 px wide and 20 px high
-            suit.Slider(slider, suit.layout.col(160, 20))
+            suit.Slider(slider, suit.layout:col(160, 20))
 
             -- put a label that shows the slider value to the right of the slider
             -- the width of the label will be 40 px
-            suit.Label(("%.02f"):format(slider.value), suit.layout.col(40))
+            suit.Label(("%.02f"):format(slider.value), suit.layout:col(40))
 
         -- close the nested layout
-        suit.layout.pop()
+        suit.layout:pop()
 
         -- put an image button below the nested cell
         -- the size of the cell will be 200 by 100 px,
         --      but the image may be bigger or smaller
         -- the button shows the image `normal' when the mouse is outside the image
         --      or above a transparent pixel
-        -- the button shows the image `hover` if the mouse is above an opaque pixel
+        -- the button shows the image `hovered` if the mouse is above an opaque pixel
         --      of the image `normal'
         -- the button shows the image `active` if the mouse is above an opaque pixel
         --      of the image `normal' and the mouse button is pressed
-        suit.ImageButton(normal, {hover = hover, active = active}, suit.layout.row(200,100))
+        suit.ImageButton(normal, {hovered = hovered, active = active}, suit.layout:row(200,100))
 
         -- if the checkbox is checked, display a precomputed layout
         if chk.checked then
             -- the precomputed layout will be 3 rows below each other
             -- the origin of the layout will be at (400,100)
             -- the minimal height of the layout will be 300 px
-            rows = suit.layout.rows{pos = {400,100}, min_height = 300,
+            rows = suit.layout:rows{pos = {400,100}, min_height = 300,
                 {200, 30},    -- the first cell will measure 200 by 30 px
                 {30, 'fill'}, -- the second cell will be 30 px wide and fill the
                               -- remaining vertical space between the other cells
@@ -165,17 +165,17 @@ The following code will create this UI:
 
     function love.draw()
         -- draw the gui
-        suit.core.draw()
+        suit.draw()
     end
 
     function love.textinput(t)
         -- forward text input to SUIT
-        suit.core.textinput(t)
+        suit.textinput(t)
     end
 
     function love.keypressed(key)
         -- forward keypressed to SUIT
-        suit.core.keypressed(key)
+        suit.keypressed(key)
     end
 
     -- generate assets (see love.load)
@@ -203,11 +203,11 @@ The following code will create this UI:
             end
         end
 
-        local normal, hover, active = love.image.newImageData(200,100), love.image.newImageData(200,100), love.image.newImageData(200,100)
+        local normal, hovered, active = love.image.newImageData(200,100), love.image.newImageData(200,100), love.image.newImageData(200,100)
         normal:mapPixel(metaballs(.48, 188,188,188))
-        hover:mapPixel(metaballs(.46, 50,153,187))
+        hovered:mapPixel(metaballs(.46, 50,153,187))
         active:mapPixel(metaballs(.43, 255,153,0))
-        return love.graphics.newImage(normal), love.graphics.newImage(hover), love.graphics.newImage(active)
+        return love.graphics.newImage(normal), love.graphics.newImage(hovered), love.graphics.newImage(active)
     end
 
 Indices and tables

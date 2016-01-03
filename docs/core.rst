@@ -76,23 +76,23 @@ Clears GUI state when exiting a frame.
 GUI State
 ^^^^^^^^^
 
-.. function:: anyHot()
+.. function:: anyHovered()
 
-   :returns: ``true`` if any widget is in the ``hot`` state.
+   :returns: ``true`` if any widget is hovered by the mouse.
 
-Checks if any widget is in the hot state
+Checks if any widget is hovered by the mouse.
 
-.. function:: isHot(id)
+.. function:: isHovered(id)
 
    :param mixed id: Identifier of the widget.
-   :returns: ``true`` if the widget is in the ``hot`` state.
+   :returns: ``true`` if the widget is hovered by the mouse.
 
 Checks if the widget identified by ``id`` is hovered by the mouse.
 
-.. function:: wasHot(id)
+.. function:: wasHovered(id)
 
    :param mixed id: Identifier of the widget.
-   :returns: ``true`` if the widget was in the ``hot`` state in the last frame.
+   :returns: ``true`` if the widget was in the hovered by the mouse in the last frame.
 
 Checks if the widget identified by ``id`` was hovered by the mouse in the last frame.
 
@@ -121,7 +121,7 @@ Checks whether the mouse cursor is in the rectangle defined by ``x,y,w,h``.
    :param function hit: Function to perform the hit test.
 
 Registers a hit-test defined by the function ``hit`` for the widget identified
-by ``id``. Sets the widget to ``hot`` if th hit-test returns ``true``. Sets the
+by ``id``. Sets the widget to ``hovered`` if th hit-test returns ``true``. Sets the
 widget to ``active`` if the hit-test returns ``true`` and the mouse button is
 pressed.
 
@@ -186,3 +186,36 @@ Checks whether the widget identified by ``id`` currently has keyboard focus.
 Checks whether the key ``key`` was pressed while the widget identified by
 ``id`` has keyboard focus.
 
+
+Instancing
+----------
+
+.. function:: new()
+
+   :returns: Separate UI state.
+
+Create a separate UI and layout state.  Everything that happens in the new
+state will not affect any other state.  You can use the new state like the
+"global" state ``suit``, but call functions with the colon syntax instead of
+the dot syntax, e.g.::
+
+    function love.load()
+        dress = suit.new()
+    end
+
+    function love.update()
+        dress.layout:reset()
+        dress:Label("Hello, World!", dress.layout:row(200,30))
+        dress:Input(input, dress.layout:row())
+    end
+
+    function love.draw()
+        dress:draw()
+    end
+
+.. warning::
+
+   Unlike UI and layout state, the theme might be shared with other states.
+   Changes in a shared theme will be shared across all themes.
+   See the :ref:`Instance Theme <instance-theme>` subsection in the
+   :doc:`gettingstarted` guide.
