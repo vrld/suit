@@ -10,8 +10,8 @@ function Layout:reset(x,y, padx,pady)
 	self._y = y or 0
 	self._padx = padx or 0
 	self._pady = pady or 0
-	self._w = 0
-	self._h = 0
+	self._w = -1
+	self._h = -1
 	self._widths = {min=math.huge,max=-math.huge}
 	self._heights = {min=math.huge,max=-math.huge}
 
@@ -82,7 +82,7 @@ local function calc_width_height(self, w, h)
 	elseif w == "median" then
 		w = self._widths[math.ceil(#self._widths/2)] or 0
 	elseif type(w) ~= "number" then
-		error("width: invalid value (" .. tostring(w) .. ")", 2)
+		error("width: invalid value (" .. tostring(w) .. ")", 3)
 	end
 
 	if h == "" or h == nil then
@@ -94,7 +94,11 @@ local function calc_width_height(self, w, h)
 	elseif h == "median" then
 		h = self._heights[math.ceil(#self._heights/2)] or 0
 	elseif type(h) ~= "number" then
-		error("width: invalid value (" .. tostring(w) .. ")",2)
+		error("width: invalid value (" .. tostring(w) .. ")", 3)
+	end
+
+	if w < 0 or h < 0 then
+		error("Invalid cell size", 3)
 	end
 
 	insert_sorted(self._widths, w)
@@ -132,7 +136,9 @@ end
 local function layout_retained_mode(self, t, constructor, string_argument_to_table, fill_width, fill_height)
 	-- sanity check
 	local p = t.pos or {0,0}
-	assert(type(p) == "table", "Invalid argument `pos' (table expected, got "..type(p)..")",2)
+	if type(p) ~= "table" then
+		error("Invalid argument `pos' (table expected, got "..type(p)..")", 2)
+	end
 
 	self:push(p[1] or 0, p[2] or 0)
 
