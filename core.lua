@@ -81,6 +81,13 @@ end
 local function grabKeyboardFocus(id)
 	if isActive(id) then
 		keyboardFocus = id
+		if love.system.getOS() == "Android" or love.system.getOS() == "iOS" then
+			if id == NONE then
+				love.keyboard.setTextInput( false )
+			else
+				love.keyboard.setTextInput( true )
+			end
+		end
 	end
 end
 
