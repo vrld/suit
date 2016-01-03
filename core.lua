@@ -64,7 +64,7 @@ end
 -- mouse handling
 function suit:mouseInRect(x,y,w,h)
 	return self.mouse_x >= x and self.mouse_y >= y and
-	       self.mouse_x <= x+w and self.mouse_y > y+h
+	       self.mouse_x <= x+w and self.mouse_y <= y+h
 end
 
 function suit:registerMouseHit(id, ul_x, ul_y, hit)
