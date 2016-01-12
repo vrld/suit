@@ -9,11 +9,11 @@ function Layout:reset(x,y, padx,pady)
 	self._x = x or 0
 	self._y = y or 0
 	self._padx = padx or 0
-	self._pady = pady or 0
-	self._w = -1
-	self._h = -1
-	self._widths = {min=math.huge,max=-math.huge}
-	self._heights = {min=math.huge,max=-math.huge}
+	self._pady = pady or self._padx
+	self._w = nil
+	self._h = nil
+	self._widths = {}
+	self._heights = {}
 
 	return self
 end
@@ -65,7 +65,7 @@ function Layout:pop()
 	self._w, self._h,
 	self._widths, self._heights = unpack(self._stack[#self._stack])
 
-	self._w, self._h = math.max(w, self._w), math.max(h, self._h)
+	self._w, self._h = math.max(w, self._w or 0), math.max(h, self._h or 0)
 
 	return w, h
 end
@@ -90,17 +90,15 @@ end
 local function insert_sorted(t, v)
 	if v <= 0 then return end
 	insert_sorted_helper(t, 1, #t, v)
-	t.min = math.min(t.min, v)
-	t.max = math.max(t.max, v)
 end
 
 local function calc_width_height(self, w, h)
 	if w == "" or w == nil then
 		w = self._w
 	elseif w == "max" then
-		w = self._widths.max
+		w = self._widths[#self._widths]
 	elseif w == "min" then
-		w = self._widths.min
+		w = self._widths[1]
 	elseif w == "median" then
 		w = self._widths[math.ceil(#self._widths/2)] or 0
 	elseif type(w) ~= "number" then
@@ -110,16 +108,16 @@ local function calc_width_height(self, w, h)
 	if h == "" or h == nil then
 		h = self._h
 	elseif h == "max" then
-		h = self._heights.max
+		h = self._heights[#self._heights]
 	elseif h == "min" then
-		h = self._heights.min
+		h = self._heights[1]
 	elseif h == "median" then
 		h = self._heights[math.ceil(#self._heights/2)] or 0
 	elseif type(h) ~= "number" then
 		error("width: invalid value (" .. tostring(w) .. ")", 3)
 	end
 
-	if w < 0 or h < 0 then
+	if not w or not h then
 		error("Invalid cell size", 3)
 	end
 
@@ -132,7 +130,7 @@ function Layout:row(w, h)
 	self._y = self._y + self._pady
 	w,h = calc_width_height(self, w, h)
 
-	local x,y = self._x, self._y + self._h
+	local x,y = self._x, self._y + (self._h or 0)
 	self._y, self._w, self._h = y, w, h
 
 	return x,y,w,h
@@ -142,7 +140,7 @@ function Layout:col(w, h)
 	self._x = self._x + self._padx
 	w,h = calc_width_height(self, w, h)
 
-	local x,y = self._x + self._w, self._y
+	local x,y = self._x + (self._w or 0), self._y
 	self._x, self._w, self._h = x, w, h
 
 	return x,y,w,h
@@ -226,7 +224,7 @@ end
 function Layout:rows(t)
 	return layout_retained_mode(self, t, self.row,
 			function(v) return {nil, v} end,
-			function() return self._widths.max end, -- fill width
+			function() return self._widths[#self._widths] end, -- fill width
 			function(l,mh,h) return (mh - h) / l.n_fill_h end) -- fill height
 end
 
@@ -234,40 +232,25 @@ function Layout:cols(t)
 	return layout_retained_mode(self, t, self.col,
 			function(v) return {v} end,
 			function(l,mw,w) return (mw - w) / l.n_fill_w end, -- fill width
-			function() return self._heights.max end) -- fill height
+			function() return self._heights[#self._heights] end) -- fill height
 end
 
--- TODO: nesting a la rows{..., cols{...} } ?
-
-local instance = Layout.new()
-return setmetatable({
-	new     = Layout.new,
-	reset   = function(...) return instance:reset(...) end,
-	padding = function(...) return instance:padding(...) end,
-	push    = function(...) return instance:push(...) end,
-	pop     = function(...) return instance:pop(...) end,
-	row     = function(...) return instance:row(...) end,
-	col     = function(...) return instance:col(...) end,
-	rows    = function(...) return instance:rows(...) end,
-	cols    = function(...) return instance:cols(...) end,
-}, {__call = function(_,...) return Layout.new(...) end})
-
---[[do
+--[[ "Tests"
+do
 
 L = Layout.new()
 
-
-
 print("immediate mode")
 print("--------------")
-x,y,w,h = L:row(100,20) -- x,y,w,h = x0,y0, 100,20
+x,y,w,h = L:row(100,20) -- x,y,w,h = 0,0, 100,20
 print(1,x,y,w,h)
-x,y,w,h = L:row()       -- x,y,w,h = x0, y0+20, 100,20 (default: reuse last dimensions)
+x,y,w,h = L:row()       -- x,y,w,h = 0, 20, 100,20 (default: reuse last dimensions)
 print(2,x,y,w,h)
-x,y,w,h = L:col(20)     -- x,y,w,h = x0+100, y0+20, 20, 20
+x,y,w,h = L:col(20)     -- x,y,w,h = 100, 20, 20, 20
 print(3,x,y,w,h)
-x,y,w,h = L:row(nil,30) -- x,y,w,h = x0+100, y0+40, 20, 30
+x,y,w,h = L:row(nil,30) -- x,y,w,h = 100, 20, 20, 30
 print(4,x,y,w,h)
+print('','','', L:size()) -- w,h = 20, 30
 print()
 
 L:reset()
@@ -307,7 +290,7 @@ local layout = L:cols{
 
 	{100, 70},
 	"max",    -- {100, 70}
-	"fill",   -- {min_width - width_of_items, 70} = {420, 70}
+	"fill",   -- {min_width - width_of_items, 70} = {220, 70}
 	"min",    -- {100,70}
 }
 
@@ -318,5 +301,23 @@ for i,x,y,w,h in layout() do
 end
 print()
 
+L:push()
+L:row()
+
 end
 --]]
+
+-- TODO: nesting a la rows{..., cols{...} } ?
+
+local instance = Layout.new()
+return setmetatable({
+	new     = Layout.new,
+	reset   = function(...) return instance:reset(...) end,
+	padding = function(...) return instance:padding(...) end,
+	push    = function(...) return instance:push(...) end,
+	pop     = function(...) return instance:pop(...) end,
+	row     = function(...) return instance:row(...) end,
+	col     = function(...) return instance:col(...) end,
+	rows    = function(...) return instance:rows(...) end,
+	cols    = function(...) return instance:cols(...) end,
+}, {__call = function(_,...) return Layout.new(...) end})
