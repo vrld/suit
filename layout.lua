@@ -1,8 +1,8 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local Layout = {}
-function Layout.new()
-	return setmetatable({_stack = {}}, {__index = Layout}):reset()
+function Layout.new(x,y,padx,pady)
+	return setmetatable({_stack = {}}, {__index = Layout}):reset(x,y,padx,pady)
 end
 
 function Layout:reset(x,y, padx,pady)
@@ -19,11 +19,33 @@ function Layout:reset(x,y, padx,pady)
 end
 
 function Layout:padding(padx,pady)
-	self._padx = padx
-	self._pady = pady
+	if padx then
+		self._padx = padx
+		self._pady = pady or padx
+	end
+	return self._padx, self._pady
 end
 
-function Layout:push(x,y)
+function Layout:pos(x,y)
+	if x and y then
+		self._x, self._y = x, y
+	end
+	return self._x, self._y
+end
+
+function Layout:size()
+	return self._w, self._h
+end
+
+function Layout:nextRow()
+	return self._x, self._y + self._h + self._pady
+end
+
+function Layout:nextCol()
+	return self._x + self._w + self._padx, self._y
+end
+
+function Layout:push(x,y, padx, pady)
 	self._stack[#self._stack+1] = {
 		self._x, self._y,
 		self._padx, self._pady,
@@ -32,7 +54,7 @@ function Layout:push(x,y)
 		self._heights,
 	}
 
-	return self:reset(x,y)
+	return self:reset(x,y, padx or self._padx, pady or self._pady)
 end
 
 function Layout:pop()
@@ -45,7 +67,7 @@ function Layout:pop()
 
 	self._w, self._h = math.max(w, self._w), math.max(h, self._h)
 
-	return self
+	return w, h
 end
 
 --- recursive binary search for position of v
@@ -139,8 +161,12 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
 	if type(p) ~= "table" then
 		error("Invalid argument `pos' (table expected, got "..type(p)..")", 2)
 	end
+	local pad = t.padding or {}
+	if type(p) ~= "table" then
+		error("Invalid argument `padding' (table expected, got "..type(p)..")", 2)
+	end
 
-	self:push(p[1] or 0, p[2] or 0)
+	self:push(p[1] or 0, p[2] or 0, pad[1] or self._padx, pad[2] or self._pady)
 
 	-- first pass: get dimensions, add layout info
 	local layout = {n_fill_w = 0, n_fill_h = 0}
@@ -182,12 +208,15 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
 	end
 
 	-- finally: return layout with iterator
-	self:pop()
+	local w, h = self:pop()
 	layout.cell = function(self, i)
 		if self ~= layout then -- allow either colon or dot syntax
 			i = self
 		end
 		return unpack(layout[i])
+	end
+	layout.size = function()
+		return w, h
 	end
 	return setmetatable(layout, {__call = function()
 		return layout_iterator, layout, 0
