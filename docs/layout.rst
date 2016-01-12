@@ -7,7 +7,7 @@ Layout
 Immediate Mode Layouts
 ----------------------
 
-.. function:: reset(x,y, pad_x, pad_y)
+.. function:: reset([x,y, [pad_x, [pad_y]]])
 
    :param numbers x,y: Origin of the layout (optional).
    :param pad_x,pad_y: Cell padding (optional).
@@ -15,18 +15,64 @@ Immediate Mode Layouts
 Reset the layout, puts the origin at ``(x,y)`` and sets the cell padding to
 ``pad_x`` and ``pad_y``.
 
-.. function:: padding(pad_x,pad_y)
+If ``x`` and ``y`` are omitted, they default to ``(0,0)``. If ``pad_x`` is
+omitted, it defaults to 0. If ``pad_y`` is omitted, it defaults to ``pad_x``.
 
-   :param pad_x,pad_y: Cell padding.
+.. function:: padding([pad_x, [pad_y]])
 
-Sets the cell padding to ``pad_x`` and ``pad_y``.
+   :param pad_x: Cell padding in x direction (optional).
+   :param pad_y: Cell padding in y direction (optional, defaults to ``pad_x``).
+   :returns: The current (or new) cell padding.
 
-.. function:: push(x,y)
+Get and set the current cell padding.
 
-   :param numbers x,y: Origin of the inner layout (optional).
+If given, sets the cell padding to ``pad_x`` and ``pad_y``.
+If only ``pad_x`` is given, set both padding in ``x`` and ``y`` direction to ``pad_x``.
 
-Saves the layout state (position, padding, sizes, etc.) on a stack and resets
-the layout with position ``(x,y)``.
+.. function:: pos([x, y])
+
+   :param x,y: New layout position (optional).
+   :returns: The current (or new) layout position.
+
+Get and set the current layout position, that is, the upper left corner of the
+*last* cell.
+
+If given, sets the layout position to ``x,y``.
+Can be helpful when you want to reset the layout origin without resetting the
+cell size information.
+Use with care: Invalidates size information of the whole layout (see below).
+
+.. function:: size()
+
+   :returns: ``width,height`` - The size of the last cell.
+
+Get the size of the last cell.
+
+.. function:: nextRow()
+
+   :returns: ``x,y`` - Upper left corner of the next row cell.
+
+Get the position of the upper left corner of the next cell in a row layout.
+Use for mixing precomputed and immediate mode layouts.
+
+.. function:: nextCol()
+
+   :returns: ``x,y`` - Upper left corner of the next column cell.
+
+Get the position of the upper left corner of the next cell in a column layout.
+Use for mixing precomputed and immediate mode layouts.
+
+.. function:: push([x,y, [padx, [pady]]])
+
+   :param numbers x,y: Origin of the layout (optional).
+   :param pad_x,pad_y: Cell padding (optional).
+
+Saves the layout state (position, padding, sizes, etc.) on a stack, resets the
+layout with position ``(x,y)`` and sets the cell padding to ``pad_x`` and
+``pad_y``.
+
+If ``x`` and ``y`` are omitted, they default to ``(0,0)``. If ``pad_x`` is
+omitted, it defaults to 0. If ``pad_y`` is omitted, it defaults to ``pad_x``.
 
 Used for nested row/column layouts.
 
@@ -85,7 +131,7 @@ Used to provide the last four arguments to a widget, e.g.::
     suit.Button("Cancel", suit.layout.col("max"))
 
 
-Predefined Layouts
+Precomputed Layouts
 ------------------
 
 Apart from immediate mode layouts, you can specify layouts in advance.
@@ -98,7 +144,9 @@ layout in advance (say, the screen size), and want certain cells to dynamically
 fill the available space; (2) You want to animate the cells.
 
 .. note::
-    Unlike immediate mode layouts, predefined layouts **can not be nested**.
+    Unlike immediate mode layouts, precomputed layouts **can not be nested**.
+    You can mix immediate mode and precomputed layouts to achieve nested
+    layouts with precomputed cells, however.
 
 Layout Specifications
 ^^^^^^^^^^^^^^^^^^^^^
@@ -132,6 +180,13 @@ Apart from ``min_height`` and ``min_width``, layout specifications can also
 define the position (upper left corner) of the layout using the ``pos`` keyword::
 
     {min_width = 300, pos = {100,100},
+        {'fill', 100}
+        {'fill'}
+    }
+
+You can also define a padding::
+
+    {min_width = 300, pos = {100,100}, padding = {5,5},
         {'fill', 100}
         {'fill'}
     }
