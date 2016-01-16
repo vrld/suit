@@ -47,7 +47,6 @@ function Layout:push(x,y)
 		self._heights,
 	}
 
-	print(padx, self._padx, pady, self._pady)
 	return self:reset(x,y, padx or self._padx, pady or self._pady)
 end
 
