@@ -11,7 +11,7 @@ return function(core, text, ...)
 	h = h or opt.font:getHeight() + 4
 
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
-	core:registerDraw(core.theme.Label, text, opt, x,y,w,h)
+	core:registerDraw(opt.draw or core.theme.Label, text, opt, x,y,w,h)
 
 	return {
 		id = opt.id,

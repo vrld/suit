@@ -28,8 +28,10 @@ return function(core, normal, ...)
 		img = opt.hovered
 	end
 
-	core:registerDraw(love.graphics.setColor, 255,255,255)
-	core:registerDraw(love.graphics.draw, img, x,y)
+	core:registerDraw(opt.draw or function(img,x,y, r,g,b,a)
+		love.graphics.setColor(r,g,b,a)
+		love.graphics.draw(img,x,y)
+	end, img, x,y, love.graphics.getColor())
 
 	return {
 		id = opt.id,

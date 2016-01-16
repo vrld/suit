@@ -111,6 +111,9 @@ The following code will create this UI:
         -- nested content, whichever is bigger
         suit.layout:push(suit.layout:row())
 
+            -- change cell padding to 3 pixels in either direction
+            suit.layout:padding(3)
+
             -- put a slider in the cell
             -- the inner cell will be 160 px wide and 20 px high
             suit.Slider(slider, suit.layout:col(160, 20))

@@ -41,7 +41,7 @@ return function(core, info, ...)
 		end
 	end
 
-	core:registerDraw(core.theme.Slider, fraction, opt, x,y,w,h)
+	core:registerDraw(opt.draw or core.theme.Slider, fraction, opt, x,y,w,h)
 
 	return {
 		id = opt.id,

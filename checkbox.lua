@@ -15,7 +15,7 @@ return function(core, checkbox, ...)
 	if hit then
 		checkbox.checked = not checkbox.checked
 	end
-	core:registerDraw(core.theme.Checkbox, checkbox, opt, x,y,w,h)
+	core:registerDraw(opt.draw or core.theme.Checkbox, checkbox, opt, x,y,w,h)
 
 	return {
 		id = opt.id,

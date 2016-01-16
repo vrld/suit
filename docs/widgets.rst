@@ -164,8 +164,10 @@ Common Options
    ``"bottom"``. Defaults to ``"middle"``.
 
 ``color``
-   Table overwriting the color. Undefined colors default to the theme colors.
+   A table to overwrite the color. Undefined colors default to the theme colors.
 
+``draw``
+   A function to replace the drawing function. Refer to :doc:`themes` for more information about the function signatures.
 
 
 Common Return States

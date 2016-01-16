@@ -116,7 +116,7 @@ Used to provide the last four arguments to a widget, e.g.::
 
 
 Precomputed Layouts
-------------------
+-------------------
 
 Apart from immediate mode layouts, you can specify layouts in advance.
 The specification is a table of tables, where each inner table follows the

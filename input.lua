@@ -86,7 +86,7 @@ return function(core, input, ...)
 		input.drawoffset = text_width - w
 	end
 
-	core:registerDraw(core.theme.Input, input, opt, x,y,w,h)
+	core:registerDraw(opt.draw or core.theme.Input, input, opt, x,y,w,h)
 
 	return {
 		id = opt.id,
