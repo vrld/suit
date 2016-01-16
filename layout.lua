@@ -38,7 +38,7 @@ function Layout:nextCol()
 	return self._x + self._w + self._padx, self._y
 end
 
-function Layout:push(x,y, padx, pady)
+function Layout:push(x,y)
 	self._stack[#self._stack+1] = {
 		self._x, self._y,
 		self._padx, self._pady,
@@ -47,6 +47,7 @@ function Layout:push(x,y, padx, pady)
 		self._heights,
 	}
 
+	print(padx, self._padx, pady, self._pady)
 	return self:reset(x,y, padx or self._padx, pady or self._pady)
 end
 
