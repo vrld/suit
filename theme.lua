@@ -104,29 +104,7 @@ function theme.Input(input, opt, x,y,w,h)
 	x = x + 3
 	w = w - 6
 
-	-- get size of text and cursor position
 	local th = opt.font:getHeight()
-	local tw = opt.font:getWidth(input.text)
-	local cursor_pos = 0
-	if input.cursor > 1 then
-		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
-		cursor_pos = opt.font:getWidth(s)
-	end
-
-	-- compute drawing offset
-	input.drawoffset = input.drawoffset or 0
-	if cursor_pos - input.drawoffset < 0 then
-		-- cursor left of input box
-		input.drawoffset = cursor_pos
-	end
-	if cursor_pos - input.drawoffset > w then
-		-- cursor right of input box
-		input.drawoffset = cursor_pos - w
-	end
-	if tw - input.drawoffset < w and tw > w then
-		-- text bigger than input box, but does not fill it
-		input.drawoffset = tw - w
-	end
 
 	-- set scissors
 	local sx, sy, sw, sh = love.graphics.getScissor()
@@ -142,8 +120,8 @@ function theme.Input(input, opt, x,y,w,h)
 	if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
 		love.graphics.setLineWidth(1)
 		love.graphics.setLineStyle('rough')
-		love.graphics.line(x + cursor_pos, y + (h-th)/2,
-		                   x + cursor_pos, y + (h+th)/2)
+		love.graphics.line(x + opt.cursor_pos, y + (h-th)/2,
+		                   x + opt.cursor_pos, y + (h+th)/2)
 	end
 
 	-- reset scissor

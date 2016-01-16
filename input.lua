@@ -14,7 +14,8 @@ return function(core, input, ...)
 	opt.id = opt.id or input
 	opt.font = opt.font or love.graphics.getFont()
 
-	w = w or opt.font:getWidth(text) + 4
+	local text_width = opt.font:getWidth(input.text)
+	w = w or text_width + 4
 	h = h or opt.font:getHeight() + 4
 
 	input.text = input.text or ""
@@ -61,6 +62,28 @@ return function(core, input, ...)
 
 		-- mouse cursor position
 		-- TODO
+	end
+
+	-- get size of text and cursor position
+	opt.cursor_pos = 0
+	if input.cursor > 1 then
+		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
+		opt.cursor_pos = opt.font:getWidth(s)
+	end
+
+	-- compute drawing offset
+	input.drawoffset = input.drawoffset or 0
+	if opt.cursor_pos - input.drawoffset < 0 then
+		-- cursor left of input box
+		input.drawoffset = opt.cursor_pos
+	end
+	if opt.cursor_pos - input.drawoffset > w then
+		-- cursor right of input box
+		input.drawoffset = opt.cursor_pos - w
+	end
+	if text_width - input.drawoffset < w and text_width > w then
+		-- text bigger than input box, but does not fill it
+		input.drawoffset = text_width - w
 	end
 
 	core:registerDraw(core.theme.Input, input, opt, x,y,w,h)
