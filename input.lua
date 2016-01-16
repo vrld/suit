@@ -26,6 +26,29 @@ return function(core, input, ...)
 	--   ...
 	--   position 6: hello|
 
+	-- get size of text and cursor position
+	opt.cursor_pos = 0
+	if input.cursor > 1 then
+		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
+		opt.cursor_pos = opt.font:getWidth(s)
+	end
+
+	-- compute drawing offset
+	input.text_draw_offset = input.text_draw_offset or 0
+	if opt.cursor_pos - input.text_draw_offset < 0 then
+		-- cursor left of input box
+		input.text_draw_offset = opt.cursor_pos
+	end
+	if opt.cursor_pos - input.text_draw_offset > w then
+		-- cursor right of input box
+		input.text_draw_offset = opt.cursor_pos - w
+	end
+	if text_width - input.text_draw_offset < w and text_width > w then
+		-- text bigger than input box, but does not fill it
+		input.text_draw_offset = text_width - w
+	end
+
+	-- user interaction
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
 	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
@@ -60,30 +83,18 @@ return function(core, input, ...)
 			input.cursor = utf8.len(input.text)+1
 		end
 
-		-- mouse cursor position
-		-- TODO
-	end
-
-	-- get size of text and cursor position
-	opt.cursor_pos = 0
-	if input.cursor > 1 then
-		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
-		opt.cursor_pos = opt.font:getWidth(s)
-	end
-
-	-- compute drawing offset
-	input.drawoffset = input.drawoffset or 0
-	if opt.cursor_pos - input.drawoffset < 0 then
-		-- cursor left of input box
-		input.drawoffset = opt.cursor_pos
-	end
-	if opt.cursor_pos - input.drawoffset > w then
-		-- cursor right of input box
-		input.drawoffset = opt.cursor_pos - w
-	end
-	if text_width - input.drawoffset < w and text_width > w then
-		-- text bigger than input box, but does not fill it
-		input.drawoffset = text_width - w
+		-- move cursor position with mouse when clicked on
+		if core:mouseReleasedOn(opt.id) then
+			local mx = core:getMousePosition() - x + input.text_draw_offset
+			input.cursor = utf8.len(input.text) + 1
+			for c = 1,input.cursor do
+				local s = input.text:sub(0, utf8.offset(input.text, c)-1)
+				if opt.font:getWidth(s) >= mx then
+					input.cursor = c-1
+					break
+				end
+			end
+		end
 	end
 
 	core:registerDraw(opt.draw or core.theme.Input, input, opt, x,y,w,h)

@@ -109,7 +109,7 @@ function theme.Input(input, opt, x,y,w,h)
 	-- set scissors
 	local sx, sy, sw, sh = love.graphics.getScissor()
 	love.graphics.setScissor(x-1,y,w+2,h)
-	x = x - input.drawoffset
+	x = x - input.text_draw_offset
 
 	-- text
 	love.graphics.setColor(opt.color and opt.color.normal or theme.color.normal.fg)
