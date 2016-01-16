@@ -26,13 +26,6 @@ function Layout:padding(padx,pady)
 	return self._padx, self._pady
 end
 
-function Layout:pos(x,y)
-	if x and y then
-		self._x, self._y = x, y
-	end
-	return self._x, self._y
-end
-
 function Layout:size()
 	return self._w, self._h
 end
@@ -164,7 +157,8 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
 		error("Invalid argument `padding' (table expected, got "..type(p)..")", 2)
 	end
 
-	self:push(p[1] or 0, p[2] or 0, pad[1] or self._padx, pad[2] or self._pady)
+	self:push(p[1] or 0, p[2] or 0)
+	self:padding(pad[1] or self._padx, pad[2] or self._pady)
 
 	-- first pass: get dimensions, add layout info
 	local layout = {n_fill_w = 0, n_fill_h = 0}

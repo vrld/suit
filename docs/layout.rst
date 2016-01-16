@@ -29,19 +29,6 @@ Get and set the current cell padding.
 If given, sets the cell padding to ``pad_x`` and ``pad_y``.
 If only ``pad_x`` is given, set both padding in ``x`` and ``y`` direction to ``pad_x``.
 
-.. function:: pos([x, y])
-
-   :param x,y: New layout position (optional).
-   :returns: The current (or new) layout position.
-
-Get and set the current layout position, that is, the upper left corner of the
-*last* cell.
-
-If given, sets the layout position to ``x,y``.
-Can be helpful when you want to reset the layout origin without resetting the
-cell size information.
-Use with care: Invalidates size information of the whole layout (see below).
-
 .. function:: size()
 
    :returns: ``width,height`` - The size of the last cell.
@@ -62,17 +49,14 @@ Use for mixing precomputed and immediate mode layouts.
 Get the position of the upper left corner of the next cell in a column layout.
 Use for mixing precomputed and immediate mode layouts.
 
-.. function:: push([x,y, [padx, [pady]]])
+.. function:: push([x,y])
 
    :param numbers x,y: Origin of the layout (optional).
-   :param pad_x,pad_y: Cell padding (optional).
 
 Saves the layout state (position, padding, sizes, etc.) on a stack, resets the
-layout with position ``(x,y)`` and sets the cell padding to ``pad_x`` and
-``pad_y``.
+layout with position ``(x,y)``.
 
-If ``x`` and ``y`` are omitted, they default to ``(0,0)``. If ``pad_x`` is
-omitted, it defaults to 0. If ``pad_y`` is omitted, it defaults to ``pad_x``.
+If ``x`` and ``y`` are omitted, they default to ``(0,0)``.
 
 Used for nested row/column layouts.
 
