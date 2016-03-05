@@ -4,11 +4,12 @@ local BASE = (...):match('(.-)[^%.]+$')
 
 local theme = {}
 theme.cornerRadius = 4
+theme.lineThickness = 1
 
 theme.color = {
-	normal   = {bg = { 66, 66, 66}, fg = {188,188,188}},
-	hovered  = {bg = { 50,153,187}, fg = {255,255,255}},
-	active   = {bg = {255,153,  0}, fg = {225,225,225}}
+	normal   = {bg = { 66, 66, 66}, fg = {188,188,188}, outline = {188,188,188}},
+	hovered  = {bg = { 50,153,187}, fg = {255,255,255}, outline = {255,255,255}},
+	active   = {bg = {255,153,  0}, fg = {225,225,225}, outline = {255,255,255}}
 }
 
 
@@ -21,9 +22,17 @@ end
 function theme.drawBox(x,y,w,h, opt, colors)
 	local colors = colors or theme.getColorForState(opt)
 	local cornerRadius = opt.cornerRadius or theme.cornerRadius
+	local lineThickness = opt.lineThickness or theme.lineThickness
 
 	love.graphics.setColor(colors.bg)
 	love.graphics.rectangle('fill', x,y, w,h, cornerRadius)
+
+	if colors.outline then
+		love.graphics.setColor(colors.outline)
+		love.graphics.setLineWidth(lineThickness)
+		love.graphics.setLineStyle('smooth')
+		love.graphics.rectangle('line', x,y, w,h, cornerRadius)
+	end
 end
 
 function theme.getVerticalOffsetForAlign(valign, font, h)
