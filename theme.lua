@@ -20,8 +20,10 @@ end
 
 function theme.drawBox(x,y,w,h, opt, colors)
 	local colors = colors or theme.getColorForState(opt)
+	local cornerRadius = opt.cornerRadius or theme.cornerRadius
+
 	love.graphics.setColor(colors.bg)
-	love.graphics.rectangle('fill', x,y, w,h, theme.cornerRadius)
+	love.graphics.rectangle('fill', x,y, w,h, cornerRadius)
 end
 
 function theme.getVerticalOffsetForAlign(valign, font, h)
