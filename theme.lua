@@ -112,7 +112,7 @@ function theme.Input(input, opt, x,y,w,h)
 	x = x - input.text_draw_offset
 
 	-- text
-	love.graphics.setColor(opt.color and opt.color.normal or theme.color.normal.fg)
+	love.graphics.setColor(opt.color and opt.color.normal.fg or theme.color.normal.fg)
 	love.graphics.setFont(opt.font)
 	love.graphics.print(input.text, x, y+(h-th)/2)
 
