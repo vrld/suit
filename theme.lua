@@ -18,7 +18,8 @@ function theme.getColorForState(opt)
 	return (opt.color and opt.color[opt.state]) or theme.color[s]
 end
 
-function theme.drawBox(x,y,w,h, colors)
+function theme.drawBox(x,y,w,h, opt, colors)
+	local colors = colors or theme.getColorForState(opt)
 	love.graphics.setColor(colors.bg)
 	love.graphics.rectangle('fill', x,y, w,h, theme.cornerRadius)
 end
@@ -45,7 +46,7 @@ end
 function theme.Button(text, opt, x,y,w,h)
 	local c = theme.getColorForState(opt)
 
-	theme.drawBox(x,y,w,h, c)
+	theme.drawBox(x,y,w,h, opt)
 	love.graphics.setColor(c.fg)
 	love.graphics.setFont(opt.font)
 
@@ -57,7 +58,7 @@ function theme.Checkbox(chk, opt, x,y,w,h)
 	local c = theme.getColorForState(opt)
 	local th = opt.font:getHeight()
 
-	theme.drawBox(x+h/10,y+h/10,h*.8,h*.8, c)
+	theme.drawBox(x+h/10,y+h/10,h*.8,h*.8, opt)
 	love.graphics.setColor(c.fg)
 	if chk.checked then
 		love.graphics.setLineStyle('smooth')
@@ -85,8 +86,8 @@ function theme.Slider(fraction, opt, x,y,w,h)
 	end
 
 	local c = theme.getColorForState(opt)
-	theme.drawBox(x,y,w,h, c)
-	theme.drawBox(x,yb,wb,hb, {bg=c.fg})
+	theme.drawBox(x,y,w,h, opt)
+	theme.drawBox(x,yb,wb,hb, opt, {bg=c.fg})
 
 	if opt.state ~= nil and opt.state ~= "normal" then
 		love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
@@ -100,7 +101,7 @@ end
 
 function theme.Input(input, opt, x,y,w,h)
 	local utf8 = require 'utf8'
-	theme.drawBox(x,y,w,h, (opt.color and opt.color.normal) or theme.color.normal)
+	theme.drawBox(x,y,w,h, opt, (opt.color and opt.color.normal) or theme.color.normal)
 	x = x + 3
 	w = w - 6
 
