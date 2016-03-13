@@ -162,9 +162,11 @@ end
 
 function suit:draw()
 	self:exitFrame()
+	love.graphics.push('all')
 	for i = 1,self.draw_queue.n do
 		self.draw_queue[i]()
 	end
+	love.graphics.pop()
 	self.draw_queue.n = 0
 	self:enterFrame()
 end
