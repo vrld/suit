@@ -9,7 +9,6 @@ local function split(str, pos)
 end
 
 return function(core, input, ...)
-	local font = love.graphics.getFont()
 	local opt, x,y,w,h = core.getOptionsAndSize(...)
 	opt.id = opt.id or input
 	opt.font = opt.font or love.graphics.getFont()
