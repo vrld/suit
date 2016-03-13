@@ -135,6 +135,12 @@ end
 
 -- state update
 function suit:enterFrame()
+	if not self.mouse_button_down then
+		self.active = nil
+	elseif self.active == nil then
+		self.active = NONE
+	end
+
 	self.hovered_last, self.hovered = self.hovered, nil
 	self:updateMouse(love.mouse.getX(), love.mouse.getY(), love.mouse.isDown(1))
 	self.key_down, self.textchar = nil, ""
@@ -142,11 +148,6 @@ function suit:enterFrame()
 end
 
 function suit:exitFrame()
-	if not self.mouse_button_down then
-		self.active = nil
-	elseif self.active == nil then
-		self.active = NONE
-	end
 end
 
 -- draw
