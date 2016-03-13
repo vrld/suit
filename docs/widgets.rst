@@ -166,6 +166,9 @@ Common Options
 ``color``
    A table to overwrite the color. Undefined colors default to the theme colors.
 
+``cornerRadius``
+  The corner radius for boxes. Overwrites the theme corner radius.
+
 ``draw``
    A function to replace the drawing function. Refer to :doc:`themes` for more information about the function signatures.
 
