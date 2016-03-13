@@ -14,7 +14,7 @@ return function(core, input, ...)
 	opt.font = opt.font or love.graphics.getFont()
 
 	local text_width = opt.font:getWidth(input.text)
-	w = w or text_width + 4
+	w = w or text_width + 6
 	h = h or opt.font:getHeight() + 4
 
 	input.text = input.text or ""
@@ -28,23 +28,24 @@ return function(core, input, ...)
 	-- get size of text and cursor position
 	opt.cursor_pos = 0
 	if input.cursor > 1 then
-		local s = input.text:sub(0, utf8.offset(input.text, input.cursor)-1)
+		local s = input.text:sub(1, utf8.offset(input.text, input.cursor)-1)
 		opt.cursor_pos = opt.font:getWidth(s)
 	end
 
 	-- compute drawing offset
+	local wm = w - 6 -- consider margin
 	input.text_draw_offset = input.text_draw_offset or 0
 	if opt.cursor_pos - input.text_draw_offset < 0 then
 		-- cursor left of input box
 		input.text_draw_offset = opt.cursor_pos
 	end
-	if opt.cursor_pos - input.text_draw_offset > w then
+	if opt.cursor_pos - input.text_draw_offset > wm then
 		-- cursor right of input box
-		input.text_draw_offset = opt.cursor_pos - w
+		input.text_draw_offset = opt.cursor_pos - wm
 	end
-	if text_width - input.text_draw_offset < w and text_width > w then
+	if text_width - input.text_draw_offset < wm and text_width > wm then
 		-- text bigger than input box, but does not fill it
-		input.text_draw_offset = text_width - w
+		input.text_draw_offset = text_width - wm
 	end
 
 	-- user interaction
