@@ -111,8 +111,8 @@ If either ``w`` or ``h`` is omitted, the value is set the last used value. Both
 
 Used to provide the last four arguments to a widget, e.g.::
 
-    suit.Button("OK", suit.layout.col(100,30))
-    suit.Button("Cancel", suit.layout.col("max"))
+    suit.Button("OK", suit.layout:col(100,30))
+    suit.Button("Cancel", suit.layout:col("max"))
 
 
 Precomputed Layouts
