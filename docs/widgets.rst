@@ -44,9 +44,6 @@ non-zero alpha value.
 You can provide additional ``hovered`` and ``active`` images, but the widget area
 is always computed from the ``normal`` image.
 
-Note that ``ImageButton`` does not recieve width and height parameters. As
-such, it does not necessarily honor the cell size of a :doc:`layout`.
-
 **Additional Options:**
 
 ``normal``
@@ -57,6 +54,21 @@ such, it does not necessarily honor the cell size of a :doc:`layout`.
 
 ``active``
    Image for the active state of the widget. Defaults to ``hovered`` if omitted.
+
+.. note::
+
+  ``ImageButton`` does not recieve width and height parameters.  As such, it
+  does not necessarily honor the cell size of a :doc:`layout`.
+
+.. note::
+
+  Unlike other widgets, ``ImageButton`` is tinted by the currently active
+  color.  If you want the button to appear untinted, make sure the active color
+  is set to white before adding the button, e.g.::
+
+    love.graphics.setColor(255,255,255)
+    suit.ImageButton(push_me, {hovered=and_then_just, active=touch_me},
+                     suit.layout:row())
 
 Mutable Widgets
 ---------------
