@@ -14,6 +14,7 @@ function Layout:reset(x,y, padx,pady)
 	self._h = nil
 	self._widths = {}
 	self._heights = {}
+	self._isFirstCell = true
 
 	return self
 end
@@ -57,6 +58,7 @@ function Layout:pop()
 	self._padx,self._pady,
 	self._w, self._h,
 	self._widths, self._heights = unpack(self._stack[#self._stack])
+	self._isFirstCell = false
 
 	self._w, self._h = math.max(w, self._w or 0), math.max(h, self._h or 0)
 
@@ -120,20 +122,29 @@ local function calc_width_height(self, w, h)
 end
 
 function Layout:row(w, h)
-	self._y = self._y + self._pady
 	w,h = calc_width_height(self, w, h)
-
 	local x,y = self._x, self._y + (self._h or 0)
+
+	if not self._isFirstCell then
+		y = y + self._pady
+	end
+	self._isFirstCell = false
+
 	self._y, self._w, self._h = y, w, h
 
 	return x,y,w,h
 end
 
 function Layout:col(w, h)
-	self._x = self._x + self._padx
 	w,h = calc_width_height(self, w, h)
 
 	local x,y = self._x + (self._w or 0), self._y
+
+	if not self._isFirstCell then
+		x = x + self._padx
+	end
+	self._isFirstCell = false
+
 	self._x, self._w, self._h = x, w, h
 
 	return x,y,w,h
