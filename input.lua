@@ -58,7 +58,7 @@ return function(core, input, ...)
 		if char ~= "" then
 			local a,b = split(input.text, input.cursor)
 			input.text = table.concat{a, char, b}
-			input.cursor = input.cursor + 1
+			input.cursor = input.cursor + utf8.len(char)
 		end
 
 		-- text editing
