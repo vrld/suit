@@ -55,7 +55,7 @@ return function(core, input, ...)
 	if opt.hasKeyboardFocus then
 		local keycode,char = core:getPressedKey()
 		-- text input
-		if char ~= "" then
+		if char and char ~= "" then
 			local a,b = split(input.text, input.cursor)
 			input.text = table.concat{a, char, b}
 			input.cursor = input.cursor + utf8.len(char)
