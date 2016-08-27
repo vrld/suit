@@ -59,6 +59,7 @@ function Layout:pop()
 	self._w, self._h,
 	self._widths, self._heights = unpack(self._stack[#self._stack])
 	self._isFirstCell = false
+	self._stack[#self._stack] = nil
 
 	self._w, self._h = math.max(w, self._w or 0), math.max(h, self._h or 0)
 
