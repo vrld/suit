@@ -5,6 +5,8 @@ local suit = require(BASE .. "core")
 
 local instance = suit.new()
 return setmetatable({
+	_instance = instance,
+
 	new = suit.new,
 	getOptionsAndSize = suit.getOptionsAndSize,
 
@@ -12,7 +14,10 @@ return setmetatable({
 	anyHovered = function(...) return instance:anyHovered(...) end,
 	isHovered = function(...) return instance:isHovered(...) end,
 	wasHovered = function(...) return instance:wasHovered(...) end,
+	anyActive = function(...) return instance:anyActive(...) end,
 	isActive = function(...) return instance:isActive(...) end,
+	anyHit = function(...) return instance:anyHit(...) end,
+	isHit = function(...) return instance:isHit(...) end,
 
 	mouseInRect = function(...) return instance:mouseInRect(...) end,
 	registerHitbox = function(...) return instance:registerHitbox(...) end,
@@ -49,7 +54,7 @@ return setmetatable({
 		if k == "theme" then
 			instance.theme = v
 		else
-			rawset(t, k, v)
+			rawset(instance, k, v)
 		end
 	end,
 	__index = function(t, k)

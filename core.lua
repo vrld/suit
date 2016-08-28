@@ -48,8 +48,20 @@ function suit:wasHovered(id)
 	return id == self.hovered_last
 end
 
+function suit:anyActive()
+	return self.active ~= nil
+end
+
 function suit:isActive(id)
 	return id == self.active
+end
+
+function suit:anyHit()
+	return self.hit ~= nil
+end
+
+function suit:isHit(id)
+	return id == self.hit
 end
 
 function suit:getStateName(id)
@@ -57,6 +69,8 @@ function suit:getStateName(id)
 		return "active"
 	elseif self:isHovered(id) then
 		return "hovered"
+	elseif self:isHit(id) then
+		return "hit"
 	end
 	return "normal"
 end
@@ -84,7 +98,11 @@ function suit:registerHitbox(id, x,y,w,h)
 end
 
 function suit:mouseReleasedOn(id)
-	return not self.mouse_button_down and self:isActive(id) and self:isHovered(id)
+	if not self.mouse_button_down and self:isActive(id) and self:isHovered(id) then
+		self.hit = id
+		return true
+	end
+	return false
 end
 
 function suit:updateMouse(x, y, button_down)
@@ -145,6 +163,7 @@ function suit:enterFrame()
 	self:updateMouse(love.mouse.getX(), love.mouse.getY(), love.mouse.isDown(1))
 	self.key_down, self.textchar = nil, ""
 	self:grabKeyboardFocus(NONE)
+	self.hit = nil
 end
 
 function suit:exitFrame()
