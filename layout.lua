@@ -35,8 +35,20 @@ function Layout:nextRow()
 	return self._x, self._y + self._h + self._pady
 end
 
+Layout.nextDown = Layout.nextRow
+
+function Layout:nextUp()
+	return self._x, self._y - self._h - self._pady
+end
+
 function Layout:nextCol()
 	return self._x + self._w + self._padx, self._y
+end
+
+Layout.nextRight = Layout.nextCol
+
+function Layout:nextLeft()
+	return self._x - self._w - self._padx, self._y
 end
 
 function Layout:push(x,y)
@@ -135,6 +147,22 @@ function Layout:row(w, h)
 	return x,y,w,h
 end
 
+Layout.down = Layout.row
+
+function Layout:up(w, h)
+	w,h = calc_width_height(self, w, h)
+	local x,y = self._x, self._y - (self._h or 0)
+
+	if not self._isFirstCell then
+		y = y - self._pady
+	end
+	self._isFirstCell = false
+
+	self._y, self._w, self._h = y, w, h
+
+	return x,y,w,h
+end
+
 function Layout:col(w, h)
 	w,h = calc_width_height(self, w, h)
 
@@ -150,6 +178,22 @@ function Layout:col(w, h)
 	return x,y,w,h
 end
 
+Layout.right = Layout.col
+
+function Layout:left(w, h)
+	w,h = calc_width_height(self, w, h)
+
+	local x,y = self._x - (self._w or 0), self._y
+
+	if not self._isFirstCell then
+		x = x - self._padx
+	end
+	self._isFirstCell = false
+
+	self._x, self._w, self._h = x, w, h
+
+	return x,y,w,h
+end
 
 local function layout_iterator(t, idx)
 	idx = (idx or 1) + 1
@@ -323,6 +367,10 @@ return setmetatable({
 	pop     = function(...) return instance:pop(...) end,
 	row     = function(...) return instance:row(...) end,
 	col     = function(...) return instance:col(...) end,
+	down    = function(...) return instance:down(...) end,
+	up      = function(...) return instance:up(...) end,
+	left    = function(...) return instance:left(...) end,
+	right   = function(...) return instance:right(...) end,
 	rows    = function(...) return instance:rows(...) end,
 	cols    = function(...) return instance:cols(...) end,
 }, {__call = function(_,...) return Layout.new(...) end})
