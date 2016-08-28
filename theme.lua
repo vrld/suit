@@ -21,6 +21,10 @@ end
 function theme.drawBox(x,y,w,h, colors, cornerRadius)
 	local colors = colors or theme.getColorForState(opt)
 	cornerRadius = cornerRadius or theme.cornerRadius
+	w = math.max(cornerRadius/2, w)
+	if h < cornerRadius/2 then
+		y,h = y - (cornerRadius - h), cornerRadius/2
+	end
 
 	love.graphics.setColor(colors.bg)
 	love.graphics.rectangle('fill', x,y, w,h, cornerRadius)
@@ -89,7 +93,7 @@ function theme.Slider(fraction, opt, x,y,w,h)
 
 	local c = theme.getColorForState(opt)
 	theme.drawBox(x,y,w,h, c, opt.cornerRadius)
-	theme.drawBox(x,yb,wb,hb, {bg=c.fg}, opt.cornerRadius)
+	theme.drawBox(xb,yb,wb,hb, {bg=c.fg}, opt.cornerRadius)
 
 	if opt.state ~= nil and opt.state ~= "normal" then
 		love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
