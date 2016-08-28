@@ -46,6 +46,56 @@ Forwards a ``love.keypressed(key)`` event to SUIT.
 Forwards a ``love.textinput(key)`` event to SUIT.
 
 
+GUI State
+^^^^^^^^^
+
+.. function:: anyHovered()
+
+   :returns: ``true`` if any widget is hovered by the mouse.
+
+Checks if any widget is hovered by the mouse.
+
+.. function:: isHovered(id)
+
+   :param mixed id: Identifier of the widget.
+   :returns: ``true`` if the widget is hovered by the mouse.
+
+Checks if the widget identified by ``id`` is hovered by the mouse.
+
+.. function:: wasHovered(id)
+
+   :param mixed id: Identifier of the widget.
+   :returns: ``true`` if the widget was in the hovered by the mouse in the last frame.
+
+Checks if the widget identified by ``id`` was hovered by the mouse in the last frame.
+
+.. function:: anyActive()
+
+   :returns: ``true`` if any widget is in the ``active`` state.
+
+Checks whether the mouse button is pressed and held on any widget.
+
+.. function:: isActive(id)
+
+   :param mixed id: Identifier of the widget.
+   :returns: ``true`` if the widget is in the ``active`` state.
+
+Checks whether the mouse button is pressed and held on the widget identified by ``id``.
+
+.. function:: anyHit()
+
+   :returns: ``true`` if the mouse was pressed and released on any widget.
+
+Check whether the mouse was pressed and released on any widget.
+
+.. function:: isHit(id)
+
+   :param mixed id: Identifier of the widget.
+   :returns: ``true`` if the mouse was pressed and released on the widget.
+
+Check whether the mouse was pressed and released on the widget identified by ``id``.
+
+
 Internal Helpers
 ----------------
 
@@ -72,36 +122,6 @@ Prepares GUI state when entering a frame.
 .. function:: exitFrame()
 
 Clears GUI state when exiting a frame.
-
-GUI State
-^^^^^^^^^
-
-.. function:: anyHovered()
-
-   :returns: ``true`` if any widget is hovered by the mouse.
-
-Checks if any widget is hovered by the mouse.
-
-.. function:: isHovered(id)
-
-   :param mixed id: Identifier of the widget.
-   :returns: ``true`` if the widget is hovered by the mouse.
-
-Checks if the widget identified by ``id`` is hovered by the mouse.
-
-.. function:: wasHovered(id)
-
-   :param mixed id: Identifier of the widget.
-   :returns: ``true`` if the widget was in the hovered by the mouse in the last frame.
-
-Checks if the widget identified by ``id`` was hovered by the mouse in the last frame.
-
-.. function:: isActive(id)
-
-   :param mixed id: Identifier of the widget.
-   :returns: ``true`` if the widget is in the ``active`` state.
-
-Checks whether the mouse button is pressed on the widget identified by ``id``.
 
 
 Mouse Input
