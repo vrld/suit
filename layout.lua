@@ -152,7 +152,7 @@ Layout.down = Layout.row
 
 function Layout:up(w, h)
 	w,h = calc_width_height(self, w, h)
-	local x,y = self._x, self._y - (self._h or 0)
+	local x,y = self._x, self._y - (self._h and h or 0)
 
 	if not self._isFirstCell then
 		y = y - self._pady
@@ -184,7 +184,7 @@ Layout.right = Layout.col
 function Layout:left(w, h)
 	w,h = calc_width_height(self, w, h)
 
-	local x,y = self._x - (self._w or 0), self._y
+	local x,y = self._x - (self._w and w or 0), self._y
 
 	if not self._isFirstCell then
 		x = x - self._padx
