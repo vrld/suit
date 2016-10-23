@@ -49,9 +49,9 @@ return function(core, input, ...)
 	end
 
 	-- user interaction
-	if input.force ~= nil and input.force then
+	if input.forcefocus ~= nil and input.forcefocus then
 		core.active = opt.id
-		input.force = false
+		input.forcefocus = false
 	end
 
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
