@@ -1,4 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil;
 
 local Layout = {}
 function Layout.new(x,y,padx,pady)
@@ -73,7 +74,7 @@ function Layout:pop()
 	self._isFirstCell = false
 	self._stack[#self._stack] = nil
 
-	self._w, self._h = math.max(w, self._w or 0), math.max(h, self._h or 0)
+	self._w, self._h = max(w, self._w or 0), max(h, self._h or 0)
 
 	return w, h
 end
@@ -85,7 +86,7 @@ local function insert_sorted_helper(t, i0, i1, v)
 		return
 	end
 
-	local i = i0 + math.floor((i1-i0)/2)
+	local i = i0 + floor((i1-i0)/2)
 	if t[i] < v then
 		return insert_sorted_helper(t, i+1, i1, v)
 	elseif t[i] > v then
@@ -108,7 +109,7 @@ local function calc_width_height(self, w, h)
 	elseif w == "min" then
 		w = self._widths[1]
 	elseif w == "median" then
-		w = self._widths[math.ceil(#self._widths/2)] or 0
+		w = self._widths[ceil(#self._widths/2)] or 0
 	elseif type(w) ~= "number" then
 		error("width: invalid value (" .. tostring(w) .. ")", 3)
 	end
@@ -120,7 +121,7 @@ local function calc_width_height(self, w, h)
 	elseif h == "min" then
 		h = self._heights[1]
 	elseif h == "median" then
-		h = self._heights[math.ceil(#self._heights/2)] or 0
+		h = self._heights[ceil(#self._heights/2)] or 0
 	elseif type(h) ~= "number" then
 		error("width: invalid value (" .. tostring(w) .. ")", 3)
 	end

@@ -1,6 +1,7 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local BASE = (...):match('(.-)[^%.]+$')
+local min, max = math.min, math.max;
 
 local theme = {}
 theme.cornerRadius = 4
@@ -21,7 +22,7 @@ end
 function theme.drawBox(x,y,w,h, colors, cornerRadius)
 	colors = colors or theme.getColorForState(opt)
 	cornerRadius = cornerRadius or theme.cornerRadius
-	w = math.max(cornerRadius/2, w)
+	w = max(cornerRadius/2, w)
 	if h < cornerRadius/2 then
 		y,h = y - (cornerRadius - h), cornerRadius/2
 	end
@@ -82,7 +83,7 @@ end
 
 function theme.Slider(fraction, opt, x,y,w,h)
 	local xb, yb, wb, hb -- size of the progress bar
-	local r =  math.min(w,h) / 2.1
+	local r =  min(w,h) / 2.1
 	if opt.vertical then
 		x, w = x + w*.25, w*.5
 		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction
@@ -107,7 +108,7 @@ end
 
 function theme.ProgressBar(fraction, opt, x,y,w,h)
 	local xb, yb, wb, hb -- size of the progress bar
-	local r =  math.min(w,h) / 2.1
+	local r =  min(w,h) / 2.1
 	if opt.vertical then
 		x, w = x + w*.25, w*.5
 		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction

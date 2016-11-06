@@ -1,14 +1,15 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local BASE = (...):match('(.-)[^%.]+$')
+local min, max = math.min, math.max;
 
 return function(core, info, ...)
 	local opt, x,y,w,h = core.getOptionsAndSize(...)
 
 	opt.id = opt.id or info
 
-	info.min = info.min or math.min(info.value, 0)
-	info.max = info.max or math.max(info.value, 1)
+	info.min = info.min or min(info.value, 0)
+	info.max = info.max or max(info.value, 1)
 	info.step = info.step or (info.max - info.min) / 10
 	local fraction = (info.value - info.min) / (info.max - info.min)
 	local value_changed = false
@@ -19,9 +20,9 @@ return function(core, info, ...)
 		-- mouse update
 		local mx,my = core:getMousePosition()
 		if opt.vertical then
-			fraction = math.min(1, math.max(0, (y+h - my) / h))
+			fraction = min(1, max(0, (y+h - my) / h))
 		else
-			fraction = math.min(1, math.max(0, (mx - x) / w))
+			fraction = min(1, max(0, (mx - x) / w))
 		end
 		local v = fraction * (info.max - info.min) + info.min
 		if v ~= info.value then
@@ -33,10 +34,10 @@ return function(core, info, ...)
 		local key_up = opt.vertical and 'up' or 'right'
 		local key_down = opt.vertical and 'down' or 'left'
 		if core:getPressedKey() == key_up then
-			info.value = math.min(info.max, info.value + info.step)
+			info.value = min(info.max, info.value + info.step)
 			value_changed = true
 		elseif core:getPressedKey() == key_down then
-			info.value = math.max(info.min, info.value - info.step)
+			info.value = max(info.min, info.value - info.step)
 			value_changed = true
 		end
 	end

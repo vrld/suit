@@ -1,4 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
+local floor = math.floor;
 
 local BASE = (...):match('(.-)[^%.]+$')
 
@@ -13,7 +14,7 @@ return function(core, normal, ...)
 	opt.state = core:registerMouseHit(opt.id, x,y, function(u,v)
 		local id = opt.normal:getData()
 		assert(id:typeOf("ImageData"), "Can only use uncompressed images")
-		u, v = math.floor(u+.5), math.floor(v+.5)
+		u, v = floor(u+.5), floor(v+.5)
 		if u < 0 or u >= opt.normal:getWidth() or v < 0 or v >= opt.normal:getHeight() then
 			return false
 		end
