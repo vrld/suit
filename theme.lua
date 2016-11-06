@@ -20,7 +20,7 @@ function theme.getColorForState(opt)
 end
 
 function theme.drawBox(x,y,w,h, colors, cornerRadius)
-	colors = colors or theme.getColorForState(opt)
+	--colors = colors or theme.getColorForState(opt)
 	cornerRadius = cornerRadius or theme.cornerRadius
 	w = max(cornerRadius/2, w)
 	if h < cornerRadius/2 then
