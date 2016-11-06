@@ -52,7 +52,7 @@ return function(core, input, ...)
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
 	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
-	if (input.candidate_text.text == "") and opt.hasKeyboardFocus then
+	if opt.hasKeyboardFocus then
 		local keycode,char = core:getPressedKey()
 		-- text input
 		if char and char ~= "" then

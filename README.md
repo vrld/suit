@@ -23,13 +23,7 @@ More info and code is over at [readthedocs](http://suit.readthedocs.org/en/lates
 local suit = require 'suit'
 
 -- storage for text input
-local input = {text = "", candidate_text = {text="", start=0, length=0}}
-
--- make love use font which support CJK text
-function love.load()
-    local font = love.graphics.newFont("NotoSansHans-Regular.otf", 20)
-    love.graphics.setFont(font)
-end
+local input = {text = ""}
 
 -- all the UI is defined in love.update or functions that are called from here
 function love.update(dt)
@@ -39,7 +33,7 @@ function love.update(dt)
 
 	-- put an input widget at the layout origin, with a cell size of 200 by 30 pixels
 	suit.Input(input, suit.layout:row(200,30))
-
+	
 	-- put a label that displays the text below the first cell
 	-- the cell size is the same as the last one (200x30 px)
 	-- the label text will be aligned to the left
@@ -47,7 +41,7 @@ function love.update(dt)
 
 	-- put an empty cell that has the same size as the last cell (200x30 px)
 	suit.layout:row()
-
+	
 	-- put a button of size 200x30 px in the cell below
 	-- if the button is pressed, quit the game
 	if suit.Button("Close", suit.layout:row()).hit then
@@ -58,11 +52,6 @@ end
 function love.draw()
 	-- draw the gui
 	suit.draw()
-end
-
-function love.textedited(text, start, length)
-    -- for IME input
-    input.candidate_text = {text = text, start= start, length = length}
 end
 
 function love.textinput(t)
