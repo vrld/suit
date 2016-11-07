@@ -30,7 +30,7 @@ Creates a label at position ``(x,y)`` with width ``w`` and height ``h``.
 
 .. function:: ImageButton(normal, options, x,y)
 
-   :param Image notmal: Image of the button in normal state.
+   :param Image normal: Image of the button in normal state.
    :param table options: Widget options.
    :param numbers x,y: Upper left corner of the widget.
    :returns: Return state (see below).
