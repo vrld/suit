@@ -25,6 +25,9 @@ local suit = require 'suit'
 -- storage for text input
 local input = {text = ""}
 
+-- By default, backspace only registers once, if you want classic GUI backspace that keeps going when pushed down
+-- Add this line: love.keyboard.setKeyRepeat(true)
+
 -- all the UI is defined in love.update or functions that are called from here
 function love.update(dt)
 	-- put the layout origin at position (100,100)
