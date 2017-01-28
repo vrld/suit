@@ -121,7 +121,12 @@ function theme.Input(input, opt, x,y,w,h)
 	-- text
 	love.graphics.setColor((opt.color and opt.color.normal and opt.color.normal.fg) or theme.color.normal.fg)
 	love.graphics.setFont(opt.font)
-	love.graphics.print(input.text, x, y+(h-th)/2)
+	if not input.password then love.graphics.print(input.text, x, y+(h-th)/2) end
+	if input.password and input.text ~= input.label then 
+		love.graphics.print(string.rep("*", string.len(input.text)), x, y+(h-th)/2)
+	else
+		love.graphics.print(input.text, x, y+(h-th)/2)
+	end	
 
 	-- cursor
 	if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
