@@ -1,6 +1,7 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local BASE = (...):match('(.-)[^%.]+$')
+local min, max = math.min, math.max;
 
 local theme = {}
 theme.cornerRadius = 4
@@ -19,9 +20,9 @@ function theme.getColorForState(opt)
 end
 
 function theme.drawBox(x,y,w,h, colors, cornerRadius)
-	local colors = colors or theme.getColorForState(opt)
+	--colors = colors or theme.getColorForState(opt)
 	cornerRadius = cornerRadius or theme.cornerRadius
-	w = math.max(cornerRadius/2, w)
+	w = max(cornerRadius/2, w)
 	if h < cornerRadius/2 then
 		y,h = y - (cornerRadius - h), cornerRadius/2
 	end
@@ -82,7 +83,7 @@ end
 
 function theme.Slider(fraction, opt, x,y,w,h)
 	local xb, yb, wb, hb -- size of the progress bar
-	local r =  math.min(w,h) / 2.1
+	local r =  min(w,h) / 2.1
 	if opt.vertical then
 		x, w = x + w*.25, w*.5
 		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction
@@ -103,6 +104,22 @@ function theme.Slider(fraction, opt, x,y,w,h)
 			love.graphics.circle('fill', x+wb, yb+hb/2, r)
 		end
 	end
+end
+
+function theme.ProgressBar(fraction, opt, x,y,w,h)
+	local xb, yb, wb, hb -- size of the progress bar
+	local r =  min(w,h) / 2.1
+	if opt.vertical then
+		x, w = x + w*.25, w*.5
+		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction
+	else
+		y, h = y + h*.25, h*.5
+		xb, yb, wb, hb = x,y, w*fraction, h
+	end
+
+	local c = opt.color and opt.color.normal or theme.color.normal
+	theme.drawBox(x,y,w,h, c, opt.cornerRadius)
+	theme.drawBox(xb,yb,wb,hb, {bg=c.fg}, opt.cornerRadius)
 end
 
 function theme.Input(input, opt, x,y,w,h)

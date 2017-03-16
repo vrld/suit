@@ -1,4 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
+local min, max, concat = math.min, math.max, table.concat;
 
 local BASE = (...):match('(.-)[^%.]+$')
 local utf8 = require 'utf8'
@@ -18,7 +19,7 @@ return function(core, input, ...)
 	h = h or opt.font:getHeight() + 4
 
 	input.text = input.text or ""
-	input.cursor = math.max(1, math.min(utf8.len(input.text)+1, input.cursor or utf8.len(input.text)+1))
+	input.cursor = max(1, min(utf8.len(input.text)+1, input.cursor or utf8.len(input.text)+1))
 	-- cursor is position *before* the character (including EOS) i.e. in "hello":
 	--   position 1: |hello
 	--   position 2: h|ello
@@ -62,26 +63,26 @@ return function(core, input, ...)
 		-- text input
 		if char and char ~= "" then
 			local a,b = split(input.text, input.cursor)
-			input.text = table.concat{a, char, b}
+			input.text = concat{a, char, b}
 			input.cursor = input.cursor + utf8.len(char)
 		end
 
 		-- text editing
 		if keycode == 'backspace' then
 			local a,b = split(input.text, input.cursor)
-			input.text = table.concat{split(a,utf8.len(a)), b}
-			input.cursor = math.max(1, input.cursor-1)
+			input.text = concat{split(a,utf8.len(a)), b}
+			input.cursor = max(1, input.cursor-1)
 		elseif keycode == 'delete' then
 			local a,b = split(input.text, input.cursor)
 			local _,b = split(b, 2)
-			input.text = table.concat{a, b}
+			input.text = concat{a, b}
 		end
 
 		-- cursor movement
 		if keycode =='left' then
-			input.cursor = math.max(0, input.cursor-1)
+			input.cursor = max(0, input.cursor-1)
 		elseif keycode =='right' then -- cursor movement
-			input.cursor = math.min(utf8.len(input.text)+1, input.cursor+1)
+			input.cursor = min(utf8.len(input.text)+1, input.cursor+1)
 		elseif keycode =='home' then -- cursor movement
 			input.cursor = 1
 		elseif keycode =='end' then -- cursor movement
