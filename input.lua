@@ -49,6 +49,11 @@ return function(core, input, ...)
 	end
 
 	-- user interaction
+	if input.forcefocus ~= nil and input.forcefocus then
+		core.active = opt.id
+		input.forcefocus = false
+	end
+
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
 	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
