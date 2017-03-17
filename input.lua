@@ -17,7 +17,10 @@ return function(core, input, ...)
 	w = w or text_width + 6
 	h = h or opt.font:getHeight() + 4
 
+	input.label = input.label or ""
+	input.password = input.password or false
 	input.text = input.text or ""
+	if input.label ~= "" then input.text = input.label end
 	input.cursor = math.max(1, math.min(utf8.len(input.text)+1, input.cursor or utf8.len(input.text)+1))
 	-- cursor is position *before* the character (including EOS) i.e. in "hello":
 	--   position 1: |hello
@@ -29,7 +32,8 @@ return function(core, input, ...)
 	opt.cursor_pos = 0
 	if input.cursor > 1 then
 		local s = input.text:sub(1, utf8.offset(input.text, input.cursor)-1)
-		opt.cursor_pos = opt.font:getWidth(s)
+		if password then  opt.cursor_pos = opt.font:getWidth(string.rep("*", string.len(input.text)))
+		else opt.cursor_pos = opt.font:getWidth(s) end
 	end
 
 	-- compute drawing offset
@@ -58,6 +62,7 @@ return function(core, input, ...)
 	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
 	if opt.hasKeyboardFocus then
+		if input.label ~= "" then input.text = "" input.label = "" input.cursor = 1 end
 		local keycode,char = core:getPressedKey()
 		-- text input
 		if char and char ~= "" then
