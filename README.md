@@ -16,6 +16,16 @@ Here is how SUIT looks like with the default theme:
 
 More info and code is over at [readthedocs](http://suit.readthedocs.org/en/latest/).
 
+## Note.
+
+The default backspace only deletes one character per input and ignores holding down the key
+
+To get a more classic backspace, add this line into your code:
+
+```lua
+love.keyboard.setKeyRepeat(true)
+```
+
 ## Hello, World!
 
 ```lua
