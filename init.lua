@@ -11,11 +11,14 @@ return setmetatable({
 	getOptionsAndSize = suit.getOptionsAndSize,
 
 	-- core functions
+	setHovered = function(...) return instance:setHovered(...) end,
 	anyHovered = function(...) return instance:anyHovered(...) end,
 	isHovered = function(...) return instance:isHovered(...) end,
 	wasHovered = function(...) return instance:wasHovered(...) end,
 	anyActive = function(...) return instance:anyActive(...) end,
+	setActive = function(...) return instance:setActive(...) end,
 	isActive = function(...) return instance:isActive(...) end,
+	setHit = function(...) return instance:setHit(...) end,
 	anyHit = function(...) return instance:anyHit(...) end,
 	isHit = function(...) return instance:isHit(...) end,
 

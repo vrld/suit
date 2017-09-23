@@ -36,6 +36,10 @@ function suit.getOptionsAndSize(opt, ...)
 end
 
 -- gui state
+function suit:setHovered(id)
+	return self.hovered ~= id
+end
+
 function suit:anyHovered()
 	return self.hovered ~= nil
 end
@@ -48,12 +52,25 @@ function suit:wasHovered(id)
 	return id == self.hovered_last
 end
 
+function suit:setActive(id)
+	return self.active ~= nil
+end
+
 function suit:anyActive()
 	return self.active ~= nil
 end
 
 function suit:isActive(id)
 	return id == self.active
+end
+
+
+function suit:setHit(id)
+	self.hit = id
+	-- simulate mouse release on button -- see suit:mouseReleasedOn()
+	self.mouse_button_down = false
+	self.active = id
+	self.hovered = id
 end
 
 function suit:anyHit()
@@ -182,7 +199,7 @@ end
 function suit:draw()
 	self:exitFrame()
 	love.graphics.push('all')
-	for i = 1,self.draw_queue.n do
+	for i = self.draw_queue.n,1,-1 do
 		self.draw_queue[i]()
 	end
 	love.graphics.pop()

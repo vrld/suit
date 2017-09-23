@@ -37,19 +37,11 @@ end
 
 Layout.nextDown = Layout.nextRow
 
-function Layout:nextUp()
-	return self._x, self._y - self._h - self._pady
-end
-
 function Layout:nextCol()
 	return self._x + self._w + self._padx, self._y
 end
 
 Layout.nextRight = Layout.nextCol
-
-function Layout:nextLeft()
-	return self._x - self._w - self._padx, self._y
-end
 
 function Layout:push(x,y)
 	self._stack[#self._stack+1] = {
@@ -152,7 +144,7 @@ Layout.down = Layout.row
 
 function Layout:up(w, h)
 	w,h = calc_width_height(self, w, h)
-	local x,y = self._x, self._y - (self._h or 0)
+	local x,y = self._x, self._y - (self._h and h or 0)
 
 	if not self._isFirstCell then
 		y = y - self._pady
@@ -184,7 +176,7 @@ Layout.right = Layout.col
 function Layout:left(w, h)
 	w,h = calc_width_height(self, w, h)
 
-	local x,y = self._x - (self._w or 0), self._y
+	local x,y = self._x - (self._w and w or 0), self._y
 
 	if not self._isFirstCell then
 		x = x - self._padx

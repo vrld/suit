@@ -231,6 +231,71 @@ available space (but you have to tell how much space there is beforehand).
 Refer to the :doc:`Layout <layout>` documentation for more information.
 
 
+Widget ids
+----------
+
+Each widget is identified by an ``id`` [4]_. Internally, this ``id`` is used t
+figure out which widget should handle user input like mouse clicks and keyboard
+presses.
+Unless specified otherwise, the ``id`` is the same as the first argument, i.e.,
+the ``id`` of ``Button("Hello, World!", ...)`` will be the string
+``"Hello, World!"``.
+In almost all of the cases, this will work fine and you don't have to worry about
+this ``id`` business.
+
+Well, almost. Problems arise when two widgets share the same id, like here::
+
+    local suit = require 'suit'
+
+    function love.update()
+        suit.layout:reset(100, 100)
+        suit.layout:padding(10)
+
+        if suit.Button("Button", suit.layout:row(200, 30)).hit then
+            love.graphics.setBackgroundColor(255,255,255)
+        end
+        if suit.Button("Button", suit.layout:row()).hit then
+            love.graphics.setBackgroundColor(0,0,0)
+        end
+    end
+
+    function love.draw()
+        suit:draw()
+    end
+
+.. image:: _static/same-ids.gif
+
+If the first button is hovered, both buttons will be highlighted, and if it pressed,
+both actions will be carried out.
+Hovering the second button will not affect the first, and clicking it will highlight
+both buttons, but only execute the action of the second button [5]_.
+
+Luckily, there is a fix: you can specify the ``id`` of any widget using the ``id``
+option, like so::
+
+    local suit = require 'suit'
+
+    function love.update()
+        suit.layout:reset(100, 100)
+        suit.layout:padding(10)
+
+        if suit.Button("Button", {id=1}, suit.layout:row(200, 30)).hit then
+            love.graphics.setBackgroundColor(255,255,255)
+        end
+        if suit.Button("Button", {id=2}, suit.layout:row()).hit then
+            love.graphics.setBackgroundColor(0,0,0)
+        end
+    end
+
+    function love.draw()
+        suit:draw()
+    end
+
+.. image:: _static/different-ids.gif
+
+Now, events from one button will not propagate to the other. Here, the both ``id`` s
+are numbers, but you can use any Lua value except ``nil`` and ``false``.
+
 Themeing
 --------
 
@@ -325,3 +390,6 @@ table or use some metatable magic::
 .. [1] But it thinks you can handle that.
 .. [2] Proportion determined by rigorous scientific experiments [3]_.
 .. [3] And theoretic reasoning. Mostly that, actually.
+.. [4] Welcome to the tautology club!
+.. [5] Immediate mode is to blame: When the second button is processed, the first
+       one is already fully evaluated. Time can not be reversed, not even by love.

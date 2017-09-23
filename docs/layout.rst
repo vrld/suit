@@ -67,6 +67,8 @@ according to the size of the popped layout.
 
 Used for nested row/column layouts.
 
+.. _layout-row:
+
 .. function:: row(w,h)
 
    :param mixed w,h: Cell width and height (optional).
@@ -91,14 +93,20 @@ Used to provide the last four arguments to a widget, e.g.::
     suit.Button("Options", suit.layout:row())
     suit.Button("Quit", suit.layout:row(nil, "median"))
 
+.. function:: down(w,h)
+
+An alias for :ref:`layout:row() <layout-row>`.
+
+.. _layout-col:
+
 .. function:: col(w,h)
 
    :param mixed w,h: Cell width and height (optional).
    :returns: Position and size of the cell: ``x,y,w,h``.
 
-Creates a new cell right to the current cell with width ``w`` and height ``h``.
-If either ``w`` or ``h`` is omitted, the value is set the last used value. Both
-``w`` and ``h`` can be a string, which takes the following meaning:
+Creates a new cell to the right of the current cell with width ``w`` and height
+``h``.  If either ``w`` or ``h`` is omitted, the value is set the last used
+value. Both ``w`` and ``h`` can be a string, which takes the following meaning:
 
 ``max``
    Maximum of all values since the last reset.
@@ -114,6 +122,59 @@ Used to provide the last four arguments to a widget, e.g.::
     suit.Button("OK", suit.layout:col(100,30))
     suit.Button("Cancel", suit.layout:col("max"))
 
+.. function:: right(w,h)
+
+An alias for :ref:`layout:col() <layout-col>`.
+
+.. function:: up(w,h)
+
+   :param mixed w,h: Cell width and height (optional).
+   :returns: Position and size of the cell: ``x,y,w,h``.
+
+Creates a new cell above the current cell with width ``w`` and height ``h``. If
+either ``w`` or ``h`` is omitted, the value is set the last used value. Both
+``w`` and ``h`` can be a string, which takes the following meaning:
+
+``max``
+   Maximum of all values since the last reset.
+
+``min``
+   Mimimum of all values since the last reset.
+
+``median``
+   Median of all values since the last reset.
+
+Be careful when mixing ``up()`` and :ref:`layout:row() <layout-row>`, as suit
+does no checking to make sure cells don't overlap. e.g.::
+
+    suit.Button("A", suit.layout:row(100,30))
+    suit.Button("B", suit.layout:row())
+    suit.Button("Also A", suit.layout:up())
+
+.. function:: left(w,h)
+
+   :param mixed w,h: Cell width and height (optional).
+   :returns: Position and size of the cell: ``x,y,w,h``.
+
+Creates a new cell to the left of the current cell with width ``w`` and height
+``h``. If either ``w`` or ``h`` is omitted, the value is set the last used
+value. Both ``w`` and ``h`` can be a string, which takes the following meaning:
+
+``max``
+   Maximum of all values since the last reset.
+
+``min``
+   Mimimum of all values since the last reset.
+
+``median``
+   Median of all values since the last reset.
+
+Be careful when mixing ``left()`` and :ref:`layout:col() <layout-col>`, as suit
+does no checking to make sure cells don't overlap. e.g.::
+
+    suit.Button("A", suit.layout:col(100,30))
+    suit.Button("B", suit.layout:col())
+    suit.Button("Also A", suit.layout:left())
 
 Precomputed Layouts
 -------------------
