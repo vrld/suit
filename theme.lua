@@ -123,12 +123,26 @@ function theme.Input(input, opt, x,y,w,h)
 	love.graphics.setFont(opt.font)
 	love.graphics.print(input.text, x, y+(h-th)/2)
 
+	-- candidate text
+	local tw = opt.font:getWidth(input.text)
+	local ctw = opt.font:getWidth(input.candidate_text.text)
+	love.graphics.setColor((opt.color and opt.color.normal and opt.color.normal.fg) or theme.color.normal.fg)
+	love.graphics.print(input.candidate_text.text, x + tw, y+(h-th)/2)
+	
+	-- candidate text rectangle box
+	love.graphics.rectangle("line", x + tw, y+(h-th)/2, ctw, th)
+
 	-- cursor
 	if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
+		local ct = input.candidate_text;
+		local ss = ct.text:sub(1, utf8.offset(ct.text, ct.start))
+		local ws = opt.font:getWidth(ss)
+		if ct.start == 0 then ws = 0 end
+
 		love.graphics.setLineWidth(1)
 		love.graphics.setLineStyle('rough')
-		love.graphics.line(x + opt.cursor_pos, y + (h-th)/2,
-		                   x + opt.cursor_pos, y + (h+th)/2)
+		love.graphics.line(x + opt.cursor_pos + ws, y + (h-th)/2,
+		                   x + opt.cursor_pos + ws, y + (h+th)/2)
 	end
 
 	-- reset scissor

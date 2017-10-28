@@ -64,6 +64,7 @@ function suit:isActive(id)
 	return id == self.active
 end
 
+
 function suit:setHit(id)
 	self.hit = id
 	-- simulate mouse release on button -- see suit:mouseReleasedOn()
