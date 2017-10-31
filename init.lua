@@ -32,6 +32,7 @@ return setmetatable({
 	getPressedKey = function(...) return instance:getPressedKey(...) end,
 	keypressed = function(...) return instance:keypressed(...) end,
 	textinput = function(...) return instance:textinput(...) end,
+	textedited = function(...) return instance:textedited(...) end,
 	grabKeyboardFocus = function(...) return instance:grabKeyboardFocus(...) end,
 	hasKeyboardFocus = function(...) return instance:hasKeyboardFocus(...) end,
 	keyPressedOn = function(...) return instance:keyPressedOn(...) end,
