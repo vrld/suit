@@ -57,7 +57,7 @@ return function(core, input, ...)
 	opt.state = core:registerHitbox(opt.id, x,y,w,h)
 	opt.hasKeyboardFocus = core:grabKeyboardFocus(opt.id)
 
-	if (input.candidate_text.text == "") and opt.hasKeyboardFocus then
+	if (core.candidate_text.text == "") and opt.hasKeyboardFocus then
 		local keycode,char = core:getPressedKey()
 		-- text input
 		if char and char ~= "" then
@@ -102,6 +102,7 @@ return function(core, input, ...)
 		end
 	end
 
+	input.candidate_text = {text=core.candidate_text.text, start=core.candidate_text.start, length=core.candidate_text.length}
 	core:registerDraw(opt.draw or core.theme.Input, input, opt, x,y,w,h)
 
 	return {

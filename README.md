@@ -23,7 +23,7 @@ More info and code is over at [readthedocs](http://suit.readthedocs.org/en/lates
 local suit = require 'suit'
 
 -- storage for text input
-local input = {text = "", candidate_text = {text="", start=0, length=0}}
+local input = {text = ""}
 
 -- make love use font which support CJK text
 function love.load()
@@ -62,7 +62,7 @@ end
 
 function love.textedited(text, start, length)
     -- for IME input
-    input.candidate_text = {text = text, start= start, length = length}
+    suit.textedited(text, start, length)
 end
 
 function love.textinput(t)

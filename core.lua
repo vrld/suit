@@ -13,6 +13,7 @@ function suit.new(theme)
 		theme = theme or default_theme,
 		mouse_x = 0, mouse_y = 0,
 		mouse_button_down = false,
+		candidate_text = {text="", start=0, length=0},
 
 		draw_queue = {n = 0},
 
@@ -144,6 +145,12 @@ end
 
 function suit:textinput(char)
 	self.textchar = char
+end
+
+function suit:textedited(text, start, length)
+	self.candidate_text.text = text
+	self.candidate_text.start = start
+	self.candidate_text.length = length
 end
 
 function suit:grabKeyboardFocus(id)
