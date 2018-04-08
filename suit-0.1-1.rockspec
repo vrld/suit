@@ -3,7 +3,11 @@ version = "0.1-1"
 source = {
   url = "git://github.com/vrld/suit.git"
 }
-description = {"Immediate mode GUI library in pure Lua."}
+description = {
+  summary="Immediate mode GUI library in pure Lua.",
+  homepage = "https://suit.readthedocs.io",
+  license = "MIT",
+}
 dependencies = {
   "lua >= 5.1"
 }
