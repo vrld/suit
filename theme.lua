@@ -2,13 +2,24 @@
 
 local BASE = (...):match('(.-)[^%.]+$')
 
+local love = require 'love'
 local theme = {}
 theme.cornerRadius = 4
 
+local divisor = love.getVersion() < 11 and 1 or 255
 theme.color = {
-	normal   = {bg = { 0.25, 0.25, 0.25}, fg = {0.73,0.73,0.73}},
-	hovered  = {bg = { 0.19,0.6,0.73}, fg = {1,1,1}},
-	active   = {bg = {1,0.6,  0}, fg = {1,1,1}}
+	normal   = {
+		bg = { 66 / divisor, 66 / divisor, 66 / divisor},
+		fg = {188 / divisor, 188 / divisor, 188 / divisor}
+	},
+	hovered  = {
+		bg = { 50 / divisor, 153 / divisor, 187 / divisor},
+		fg = {255 / divisor, 255 / divisor, 255 / divisor}
+	},
+	active   = {
+		bg = {255 / divisor, 153 / divisor, 0 / divisor},
+		fg = {225 / divisor, 225 / divisor, 225 / divisor}
+	}
 }
 
 
