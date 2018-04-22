@@ -11,14 +11,11 @@ return function(core, normal, ...)
 	opt.id = opt.id or opt.normal
 
 	opt.state = core:registerMouseHit(opt.id, x,y, function(u,v)
-		local id = opt.normal:getData()
-		assert(id:typeOf("ImageData"), "Can only use uncompressed images")
 		u, v = math.floor(u+.5), math.floor(v+.5)
 		if u < 0 or u >= opt.normal:getWidth() or v < 0 or v >= opt.normal:getHeight() then
 			return false
 		end
-		local _,_,_,a = id:getPixel(u,v)
-		return a > 0
+		return true
 	end)
 
 	local img = opt.normal

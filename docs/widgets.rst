@@ -39,8 +39,8 @@ Creates an image button widget at position ``(x,y)``.
 Unlike all other widgets, an ``ImageButton`` is not affected by the current
 theme.
 The argument ``normal`` defines the image of the normal state as well as the
-area of the widget: The button activates when the mouse is over a pixel with
-non-zero alpha value.
+area of the widget: The button activates when the mouse is over a pixel of the
+rectangular image area.
 You can provide additional ``hovered`` and ``active`` images, but the widget area
 is always computed from the ``normal`` image.
 
