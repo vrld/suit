@@ -5,11 +5,19 @@ local BASE = (...):match('(.-)[^%.]+$')
 local theme = {}
 theme.cornerRadius = 4
 
-theme.color = {
-	normal   = {bg = { 64, 64, 64}, fg = {186,186,186}},
-	hovered  = {bg = { 48,186,186}, fg = {255,255,255}},
-	active   = {bg = {255,153,  0}, fg = {255,255,255}}
-}
+if love._version_major==0 and love._version_minor<=10 then
+	theme.color = {
+		normal   = {bg = { 64, 64, 64}, fg = {186,186,186}},
+		hovered  = {bg = { 48,186,186}, fg = {255,255,255}},
+		active   = {bg = {255,153,  0}, fg = {255,255,255}}
+	}
+else
+	theme.color = {
+		normal   = {bg = { 0.25, 0.25, 0.25}, fg = {0.73,0.73,0.73}},
+		hovered  = {bg = { 0.19,0.6,0.73}, fg = {1,1,1}},
+		active   = {bg = {1,0.6,  0}, fg = {1,1,1}}
+	}
+end
 
 
 -- HELPER
