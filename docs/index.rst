@@ -49,7 +49,7 @@ The following code will create this UI:
     -- generate some assets (below)
     function love.load()
         snd = generateClickySound()
-        normal, hovered, active = generateImageButton()
+        normal, hovered, active, mask = generateImageButton()
         smallerFont = love.graphics.newFont(10)
     end
 
@@ -128,13 +128,14 @@ The following code will create this UI:
         -- put an image button below the nested cell
         -- the size of the cell will be 200 by 100 px,
         --      but the image may be bigger or smaller
-        -- the button shows the image `normal' when the mouse is outside the image
-        --      or above a transparent pixel
-        -- the button shows the image `hovered` if the mouse is above an opaque pixel
-        --      of the image `normal'
+        -- the button shows the image `normal' when the button is inactive
+        -- the button shows the image `hovered` if the mouse is over an opaque pixel
+        --      of the ImageData `mask`
         -- the button shows the image `active` if the mouse is above an opaque pixel
-        --      of the image `normal' and the mouse button is pressed
-        suit.ImageButton(normal, {hovered = hovered, active = active}, suit.layout:row(200,100))
+        --      of the ImageData `mask` and the mouse button is pressed
+        -- if `mask` is omitted, the alpha-test will be swapped for a test whether
+        --      the mouse is in the area occupied by the widget
+        suit.ImageButton(normal, {mask = mask, hovered = hovered, active = active}, suit.layout:row(200,50))
 
         -- if the checkbox is checked, display a precomputed layout
         if chk.checked then
@@ -200,17 +201,17 @@ The following code will create this UI:
                 local d2 = math.exp(-((px+.7)^2 + (py+.1)^2) * 2)
                 local d = (d1 + d2)/2
                 if d > t then
-                    return r,g,b, 255 * ((d-t) / (1-t))^.2
+                    return r,g,b, ((d-t) / (1-t))^.2
                 end
                 return 0,0,0,0
             end
         end
 
         local normal, hovered, active = love.image.newImageData(200,100), love.image.newImageData(200,100), love.image.newImageData(200,100)
-        normal:mapPixel(metaballs(.48, 188,188,188))
-        hovered:mapPixel(metaballs(.46, 50,153,187))
-        active:mapPixel(metaballs(.43, 255,153,0))
-        return love.graphics.newImage(normal), love.graphics.newImage(hovered), love.graphics.newImage(active)
+        normal:mapPixel(metaballs(.48, .74,.74,.74))
+        hovered:mapPixel(metaballs(.46, .2,.6,.6))
+        active:mapPixel(metaballs(.43, 1,.6,0))
+        return love.graphics.newImage(normal), love.graphics.newImage(hovered), love.graphics.newImage(active), normal
     end
 
 Indices and tables

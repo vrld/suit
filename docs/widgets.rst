@@ -30,7 +30,7 @@ Creates a label at position ``(x,y)`` with width ``w`` and height ``h``.
 
 .. function:: ImageButton(normal, options, x,y)
 
-   :param Image normal: Image of the button in normal state.
+   :param mixed normal: Image of the button in normal state.
    :param table options: Widget options.
    :param numbers x,y: Upper left corner of the widget.
    :returns: Return state (see below).
@@ -39,12 +39,20 @@ Creates an image button widget at position ``(x,y)``.
 Unlike all other widgets, an ``ImageButton`` is not affected by the current
 theme.
 The argument ``normal`` defines the image of the normal state as well as the
-area of the widget: The button activates when the mouse is over a pixel with
-non-zero alpha value.
+area of the widget.
+The button activates when the mouse enters the area occupied by the widget.
+If the option ``mask`` defined, the button activates only if the mouse is over
+a pixel with non-zero alpha.
+You can provide additional ``hovered`` and ``active`` images, but the widget area
+is always computed from the ``normal`` image.
 You can provide additional ``hovered`` and ``active`` images, but the widget area
 is always computed from the ``normal`` image.
 
 **Additional Options:**
+
+``mask``
+   Alpha-mask of the button, i.e. an ``ImageData`` of the same size as the
+   ``normal`` image that has non-zero alpha where the button should activate.
 
 ``normal``
    Image for the normal state of the widget. Defaults to widget payload.

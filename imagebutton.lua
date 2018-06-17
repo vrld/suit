@@ -2,36 +2,49 @@
 
 local BASE = (...):match('(.-)[^%.]+$')
 
+local function isType(val, typ)
+	return type(val) == "userdata" and val.typeOf and val:typeOf(typ)
+end
+
 return function(core, normal, ...)
 	local opt, x,y = core.getOptionsAndSize(...)
 	opt.normal = normal or opt.normal or opt[1]
 	opt.hovered = opt.hovered or opt[2] or opt.normal
 	opt.active = opt.active or opt[3] or opt.hovered
-	assert(opt.normal, "Need at least `normal' state image")
 	opt.id = opt.id or opt.normal
 
-	opt.state = core:registerMouseHit(opt.id, x,y, function(u,v)
-		local id = opt.normal:getData()
-		assert(id:typeOf("ImageData"), "Can only use uncompressed images")
+	local image = assert(opt.normal, "No image for state `normal'")
+
+	core:registerMouseHit(opt.id, x, y, function(u,v)
+		-- mouse in image?
 		u, v = math.floor(u+.5), math.floor(v+.5)
-		if u < 0 or u >= opt.normal:getWidth() or v < 0 or v >= opt.normal:getHeight() then
+		if u < 0 or u >= image:getWidth() or v < 0 or v >= mask:getHeight() then
 			return false
 		end
-		local _,_,_,a = id:getPixel(u,v)
-		return a > 0
+
+		if opt.mask then
+			-- alpha test
+			assert(isType(opt.mask, "ImageData"), "Option `mask` is not a love.image.ImageData")
+			assert(u < mask:getWidth() and v < mask:getHeight(), "Mask may not be smaller than image.")
+			local _,_,_,a = mask:getPixel(u,v)
+			return a > 0
+		end
+
+		return true
 	end)
 
-	local img = opt.normal
 	if core:isActive(opt.id) then
-		img = opt.active
+		image = opt.active
 	elseif core:isHovered(opt.id) then
-		img = opt.hovered
+		image = opt.hovered
 	end
 
-	core:registerDraw(opt.draw or function(img,x,y, r,g,b,a)
+	assert(isType(image, "Image"), "state image is not a love.graphics.image")
+
+	core:registerDraw(opt.draw or function(image,x,y, r,g,b,a)
 		love.graphics.setColor(r,g,b,a)
-		love.graphics.draw(img,x,y)
-	end, img, x,y, love.graphics.getColor())
+		love.graphics.draw(image,x,y)
+	end, image, x,y, love.graphics.getColor())
 
 	return {
 		id = opt.id,
