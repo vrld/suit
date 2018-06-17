@@ -100,7 +100,7 @@ function suit:mouseInRect(x,y,w,h)
 end
 
 function suit:registerMouseHit(id, ul_x, ul_y, hit)
-	if hit(self.mouse_x - ul_x, self.mouse_y - ul_y) then
+	if not self.hovered and hit(self.mouse_x - ul_x, self.mouse_y - ul_y) then
 		self.hovered = id
 		if self.active == nil and self.mouse_button_down then
 			self.active = id
