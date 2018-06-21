@@ -5,7 +5,7 @@ Before actually getting started, it is important to understand the motivation
 and mechanics behind SUIT:
 
 - **Immediate mode is better than retained mode**
-- **Layout does not care about widgets**
+- **Layout should not care about content**
 - **Less is more**
 
 Immediate mode?
@@ -68,11 +68,11 @@ to design a user interface.
 SUIT is not a complete GUI library: It does not take control of the runtime.
 You have to do everything yourself [1]_.
 
-**SUIT is not good at word processors!**
+**SUIT is not good at processing words!**
 
 
-Hello, World
-------------
+Hello, World!
+-------------
 
 SUITing up is is straightforward: Define your GUI in ``love.update()``, and
 draw it in ``love.draw()``::
@@ -96,15 +96,19 @@ draw it in ``love.draw()``::
         suit.draw()
     end
 
-This will produce this UI (after clicking the button):
+This will produce this UI:
 
 .. image:: _static/hello-world.gif
 
-As written above, the two widgets are each created by a function call
+The two widgets (the button and the label) are each created by a function call
 (:func:`suit.Button <Button>` and :func:`suit.Label <Label>`).  The first
-argument to a widget function is always the "payload" of the widget, and the
-last four arguments define the position and dimension of the widget.  The
-function returns a table that indicates the UI state of the widget.
+argument to a widget function always defines the *payload* of the widget.
+Different widgets expect different payloads.
+Here, both :func:`suit.Button <Button>` and :func:`suit.Label <Label>` expect a
+string.
+The last four arguments of a widget function define the position and dimension
+of the widget.
+The function returns a table that indicates the UI state of the widget.
 Here, the state ``hit`` is used to figure out if the mouse was clicked and
 released on the button.  See :doc:`Widgets <widgets>` for more info on widget
 states.
@@ -112,8 +116,8 @@ states.
 Mutable state
 -------------
 
-Widgets that mutate some state - input boxes, checkboxes and sliders - receive
-a table argument as payload, e.g.::
+Widgets that mutate some state - input boxes, checkboxes and sliders - expect
+a table as their payload, e.g.::
 
     local slider = {value = 1, min = 0, max = 2}
     function love.update(dt)
@@ -131,8 +135,7 @@ Options
 -------
 
 You can define optional, well, options after the payload.  Most options affect
-how the widget is drawn.  For example, to align the label text to the left in
-the above example, you would write::
+how the widget is drawn.  For example, to align the label text to the left::
 
     local slider = {value = 1, max = 2}
     function love.update(dt)
@@ -148,8 +151,8 @@ the theme.  See :doc:`Widgets <widgets>` for more info on widget options.
 Keyboard input
 --------------
 
-The :func:`input widget <Input>` requires that you forward the ``keypressed``
-and ``textinput`` events to SUIT::
+The :func:`Input` widget requires that you forward the ``keypressed`` and
+``textinput`` events to SUIT::
 
     local input = {text = ""}
     function love.update(dt)
@@ -168,7 +171,7 @@ and ``textinput`` events to SUIT::
 
 .. image:: _static/keyboard.gif
 
-The slider widget can also react to keyboard input.  The mouse state is
+The :func:`Slider` widget can also react to keyboard input.  The mouse state is
 automatically updated, but you can provide your own version of reality if you
 need to.  See the :doc:`Core functions <core>` for more details.
 
@@ -185,7 +188,7 @@ you can directly pass as the final four arguments to the widget functions.
 If you have ever dabbled with `Qt's <http://qt.io>`_ ``QBoxLayout``, you
 already know 89% [2]_ of what you need to know.
 
-The first example can be written as follows::
+Hello, World! can be rewritten as follows::
 
     suit = require 'suit'
 
@@ -234,10 +237,10 @@ Refer to the :doc:`Layout <layout>` documentation for more information.
 Widget ids
 ----------
 
-Each widget is identified by an ``id`` [4]_. Internally, this ``id`` is used t
+Each widget is identified by an ``id`` [4]_. Internally, this ``id`` is used to
 figure out which widget should handle user input like mouse clicks and keyboard
 presses.
-Unless specified otherwise, the ``id`` is the same as the first argument, i.e.,
+Unless specified otherwise, the ``id`` is the same as the payload, i.e.,
 the ``id`` of ``Button("Hello, World!", ...)`` will be the string
 ``"Hello, World!"``.
 In almost all of the cases, this will work fine and you don't have to worry about
@@ -332,10 +335,10 @@ You can also do minimally invasive surgery::
 GUI Instances
 -------------
 
-Sometimes you might feel the need to separate parts of the GUI.  Maybe the
-widgets should have a different theme, maybe certain should always be drawn
-before or after other UI elements, or maybe you don't want the UI state to
-"leak" (e.g., from a stacked pause gamestate to the main gamestate).
+Sometimes you might feel the need to separate parts of the GUI.  Maybe certain
+should always be drawn before or after other UI elements, or maybe you don't
+want the UI state to "leak" (e.g., from a stacked pause gamestate to the main
+gamestate).
 
 For this reason, SUIT allows you to create GUI instances::
 
