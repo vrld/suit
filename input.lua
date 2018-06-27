@@ -18,7 +18,11 @@ return function(core, input, ...)
 	h = h or opt.font:getHeight() + 4
 
 	input.text = input.text or ""
-	input.cursor = math.max(1, math.min(utf8.len(input.text)+1, input.cursor or utf8.len(input.text)+1))
+	local masked_or_normal = input.text
+	if input.masked then
+		masked_or_normal = string.rep("*", utf8.len(input.text))
+	end
+	input.cursor = math.max(1, math.min(utf8.len(masked_or_normal)+1, input.cursor or utf8.len(masked_or_normal)+1))
 	-- cursor is position *before* the character (including EOS) i.e. in "hello":
 	--   position 1: |hello
 	--   position 2: h|ello
@@ -28,7 +32,7 @@ return function(core, input, ...)
 	-- get size of text and cursor position
 	opt.cursor_pos = 0
 	if input.cursor > 1 then
-		local s = input.text:sub(1, utf8.offset(input.text, input.cursor)-1)
+		local s = masked_or_normal:sub(1, utf8.offset(masked_or_normal, input.cursor)-1)
 		opt.cursor_pos = opt.font:getWidth(s)
 	end
 
@@ -91,9 +95,9 @@ return function(core, input, ...)
 		-- move cursor position with mouse when clicked on
 		if core:mouseReleasedOn(opt.id) then
 			local mx = core:getMousePosition() - x + input.text_draw_offset
-			input.cursor = utf8.len(input.text) + 1
+			input.cursor = utf8.len(masked_or_normal) + 1
 			for c = 1,input.cursor do
-				local s = input.text:sub(0, utf8.offset(input.text, c)-1)
+				local s = masked_or_normal:sub(0, utf8.offset(masked_or_normal, c)-1)
 				if opt.font:getWidth(s) >= mx then
 					input.cursor = c-1
 					break
