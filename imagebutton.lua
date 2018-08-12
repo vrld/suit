@@ -18,7 +18,7 @@ return function(core, normal, ...)
 	core:registerMouseHit(opt.id, x, y, function(u,v)
 		-- mouse in image?
 		u, v = math.floor(u+.5), math.floor(v+.5)
-		if u < 0 or u >= image:getWidth() or v < 0 or v >= mask:getHeight() then
+		if u < 0 or u >= image:getWidth() or v < 0 or v >= image:getHeight() then
 			return false
 		end
 
