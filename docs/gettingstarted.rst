@@ -336,9 +336,9 @@ GUI Instances
 -------------
 
 Sometimes you might feel the need to separate parts of the GUI.  Maybe certain
-should always be drawn before or after other UI elements, or maybe you don't
-want the UI state to "leak" (e.g., from a stacked pause gamestate to the main
-gamestate).
+UI elements should always be drawn before or after other UI elements, or maybe
+you don't want the UI state to "leak" (e.g., from a stacked pause gamestate to
+the main gamestate).
 
 For this reason, SUIT allows you to create GUI instances::
 
