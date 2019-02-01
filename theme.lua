@@ -121,7 +121,12 @@ function theme.Input(input, opt, x,y,w,h)
 	-- text
 	love.graphics.setColor((opt.color and opt.color.normal and opt.color.normal.fg) or theme.color.normal.fg)
 	love.graphics.setFont(opt.font)
-	love.graphics.print(input.text, x, y+(h-th)/2)
+
+	local masked_or_normal = input.text
+	if input.masked then
+		masked_or_normal = string.rep("*", utf8.len(input.text))
+	end
+	love.graphics.print(masked_or_normal, x, y+(h-th)/2)
 
 	-- candidate text
 	local tw = opt.font:getWidth(input.text)
