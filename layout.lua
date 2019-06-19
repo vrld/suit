@@ -277,6 +277,10 @@ function Layout:cols(t)
 			function() return self._heights[#self._heights] end) -- fill height
 end
 
+function Layout:boundingBox()
+	return self._x, self._y, self._w, self._h
+end
+
 --[[ "Tests"
 do
 
