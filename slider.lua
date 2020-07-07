@@ -24,6 +24,8 @@ return function(core, info, ...)
 			fraction = math.min(1, math.max(0, (mx - x) / w))
 		end
 		local v = fraction * (info.max - info.min) + info.min
+		v = math.floor((v/info.step) + 0.5) * info.step			--Snaps slider to nearest step interval.
+		fraction = v / (info.max - info.min) + info.min			--Updates slider drawing during mouse drag.
 		if v ~= info.value then
 			info.value = v
 			value_changed = true
