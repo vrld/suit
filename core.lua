@@ -38,7 +38,7 @@ end
 
 -- gui state
 function suit:setHovered(id)
-	return self.hovered ~= id
+	self.hovered = id
 end
 
 function suit:anyHovered()
@@ -54,7 +54,7 @@ function suit:wasHovered(id)
 end
 
 function suit:setActive(id)
-	return self.active ~= nil
+	self.active = id
 end
 
 function suit:anyActive()
