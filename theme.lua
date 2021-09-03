@@ -83,7 +83,7 @@ end
 function theme.Slider(fraction, opt, x,y,w,h)
 	local xb, yb, wb, hb -- size of the progress bar
 	local r =  math.min(w,h) / 2.1
-	if opt.vertical then
+	if opt.id.vertical == true then
 		x, w = x + w*.25, w*.5
 		xb, yb, wb, hb = x, y+h*(1-fraction), w, h*fraction
 	else
@@ -97,7 +97,7 @@ function theme.Slider(fraction, opt, x,y,w,h)
 
 	if opt.state ~= nil and opt.state ~= "normal" then
 		love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
-		if opt.vertical then
+		if opt.id.vertical then
 			love.graphics.circle('fill', x+wb/2, yb, r)
 		else
 			love.graphics.circle('fill', x+wb, yb+hb/2, r)

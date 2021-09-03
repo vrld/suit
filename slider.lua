@@ -18,7 +18,7 @@ return function(core, info, ...)
 	if core:isActive(opt.id) then
 		-- mouse update
 		local mx,my = core:getMousePosition()
-		if opt.vertical then
+		if opt.id.vertical then
 			fraction = math.min(1, math.max(0, (y+h - my) / h))
 		else
 			fraction = math.min(1, math.max(0, (mx - x) / w))
@@ -30,8 +30,8 @@ return function(core, info, ...)
 		end
 
 		-- keyboard update
-		local key_up = opt.vertical and 'up' or 'right'
-		local key_down = opt.vertical and 'down' or 'left'
+		local key_up = opt.id.vertical and 'up' or 'right'
+		local key_down = opt.id.vertical and 'down' or 'left'
 		if core:getPressedKey() == key_up then
 			info.value = math.min(info.max, info.value + info.step)
 			value_changed = true
